@@ -37,25 +37,25 @@ spec:
       volumes:
         - name: opt-app
           hostPath:
-            path: /opt/kickstart-docker/app
+            path: /opt/kickstart-kubernetes/app
             type: Directory
         - name: etc-nginx-nginx-conf
           hostPath:
-            path: /opt/kickstart-docker/nginx/conf/main.conf
+            path: /opt/kickstart-kubernetes/nginx/conf/main.conf
             type: File
         - name: etc-nginx-conf-d-app-conf
           hostPath:
-            path: /opt/kickstart-docker/nginx/conf/app.conf
+            path: /opt/kickstart-kubernetes/nginx/conf/app.conf
             type: File
         - name: etc-supervisord-conf
           hostPath:
-            path: /opt/kickstart-docker/supervisor/conf/main.conf
+            path: /opt/kickstart-kubernetes/supervisor/conf/main.conf
             type: File
         - name: etc-supervisord-d-app-ini
           hostPath:
-            path: /opt/kickstart-docker/supervisor/conf/app.ini
+            path: /opt/kickstart-kubernetes/supervisor/conf/app.ini
             type: File
         - name: etc-supervisord-d-nginx-ini
           hostPath:
-            path: /opt/kickstart-docker/supervisor/conf/nginx.ini
+            path: /opt/kickstart-kubernetes/supervisor/conf/nginx.ini
             type: File

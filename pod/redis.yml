@@ -35,21 +35,21 @@ spec:
       volumes:
         - name: opt-redis-data
           hostPath:
-            path: /opt/kickstart-docker/redis/data
+            path: /opt/kickstart-kubernetes/redis/data
             type: Directory
         - name: opt-redis-log
           hostPath:
-            path: /opt/kickstart-docker/redis/log
+            path: /opt/kickstart-kubernetes/redis/log
             type: Directory
         - name: opt-redis-conf-redis-conf
           hostPath:
-            path: /opt/kickstart-docker/redis/conf/main.conf
+            path: /opt/kickstart-kubernetes/redis/conf/main.conf
             type: File
         - name: etc-supervisord-conf
           hostPath:
-            path: /opt/kickstart-docker/supervisor/conf/main.conf
+            path: /opt/kickstart-kubernetes/supervisor/conf/main.conf
             type: File
         - name: etc-supervisord-d-redis-ini
           hostPath:
-            path: /opt/kickstart-docker/supervisor/conf/redis.ini
+            path: /opt/kickstart-kubernetes/supervisor/conf/redis.ini
             type: File
