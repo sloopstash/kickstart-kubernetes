@@ -15,10 +15,10 @@ Vagrant.configure("2") do |config|
   config.vm.box = "centos/7"
 
   # Define VirtualBox machine name.
-  config.vm.define "sloopstash-k8s-mgr"
+  config.vm.define "sloopstash-k8s-mtr"
 
   # Set virtual machine hostname.
-  config.vm.hostname = "sloopstash-k8s-mgr"
+  config.vm.hostname = "sloopstash-k8s-mtr"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -71,7 +71,7 @@ Vagrant.configure("2") do |config|
     vb.cpus = "2"
 
     # VirtualBox machine name.
-    vb.name = "sloopstash-k8s-mgr"
+    vb.name = "sloopstash-k8s-mtr"
   end
   #
   # View the documentation for the provider you are using for more
