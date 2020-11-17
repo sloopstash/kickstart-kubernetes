@@ -8,7 +8,7 @@ spec:
   - host: app.crm
     http:
       paths:
-      - path: /dashboard
+      - path: /
         pathType: Prefix
         backend:
           service:
