@@ -4,7 +4,8 @@ metadata:
   name: qa
 rules:
   - apiGroups:
-      - rbac.authorization.k8s.io
+      - ''
+      - apps
     resources:
       - deployments
       - pods
@@ -15,7 +16,7 @@ rules:
       - update
       - patch
   - apiGroups:
-      - rbac.authorization.k8s.io
+      - ''
     resources:
       - services
     verbs:
@@ -23,9 +24,10 @@ rules:
       - list
       - watch
   - apiGroups:
-      - rbac.authorization.k8s.io
+      - extensions
+      - networking.k8s.io
     resources:
-      - ingress
+      - ingresses
     verbs:
       - get
       - list

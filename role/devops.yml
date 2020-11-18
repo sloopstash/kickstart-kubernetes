@@ -4,7 +4,8 @@ metadata:
   name: devops
 rules:
   - apiGroups:
-      - rbac.authorization.k8s.io
+      - ''
+      - apps
     resources:
       - deployments
       - pods
@@ -17,7 +18,7 @@ rules:
       - patch
       - delete
   - apiGroups:
-      - rbac.authorization.k8s.io
+      - ''
     resources:
       - services
     verbs:
@@ -29,9 +30,10 @@ rules:
       - patch
       - delete
   - apiGroups:
-      - rbac.authorization.k8s.io
+      - extensions
+      - networking.k8s.io
     resources:
-      - ingress
+      - ingresses
     verbs:
       - get
       - list
