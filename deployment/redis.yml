@@ -32,6 +32,17 @@ spec:
             - "/etc/supervisord.conf"
           ports:
             - containerPort: 6379
+        - name: log
+          image: sloopstash/redis:v1
+          volumeMounts:
+            - name: opt-redis-log
+              mountPath: /opt/redis/log
+            - name: etc-supervisord-conf
+              mountPath: /etc/supervisord.conf
+          command:
+            - "/usr/bin/supervisord"
+            - "-c"
+            - "/etc/supervisord.conf"
       volumes:
         - name: opt-redis-data
           hostPath:
