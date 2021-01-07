@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  selector:
+    matchLabels:
+      service: redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: redis
+    spec:
+      containers:
+        - name: main
+          image: sloopstash/redis:v1
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: opt-redis-data
+              mountPath: /opt/redis/data
+            - name: opt-redis-log
+              mountPath: /opt/redis/log
+            - name: opt-redis-conf-redis-conf
+              mountPath: /opt/redis/conf/redis.conf
+            - name: etc-supervisord-conf
+              mountPath: /etc/supervisord.conf
+            - name: etc-supervisord-d-redis-ini
+              mountPath: /etc/supervisord.d/redis.ini
+          command:
+            - "/usr/bin/supervisord"
+            - "-c"
+            - "/etc/supervisord.conf"
+          ports:
+            - containerPort: 6379
+        - name: log
+          image: sloopstash/redis:v1
+          volumeMounts:
+            - name: opt-redis-log
+              mountPath: /opt/redis/log
+            - name: etc-supervisord-conf
+              mountPath: /etc/supervisord.conf
+          command:
+            - "/usr/bin/supervisord"
+            - "-c"
+            - "/etc/supervisord.conf"
+      volumes:
+        - name: opt-redis-data
+          hostPath:
+            path: /opt/kickstart-kubernetes/redis/data
+            type: Directory
+        - name: opt-redis-log
+          hostPath:
+            path: /opt/kickstart-kubernetes/redis/log
+            type: Directory
+        - name: opt-redis-conf-redis-conf
+          hostPath:
+            path: /opt/kickstart-kubernetes/redis/conf/main.conf
+            type: File
+        - name: etc-supervisord-conf
+          hostPath:
+            path: /opt/kickstart-kubernetes/supervisor/conf/main.conf
+            type: File
+        - name: etc-supervisord-d-redis-ini
+          hostPath:
+            path: /opt/kickstart-kubernetes/supervisor/conf/redis.ini
+            type: File
