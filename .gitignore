@@ -4,3 +4,11 @@ redis/log/redis.log
 tmp/*
 app/*
 .vagrant/*
+**/.terraform/*
+*.tfstate
+*.tfstate.backup*
+*.tfplan
+**/terraform.tfstate.d/*
+.terraform.lock.hcl
+*.log
+
