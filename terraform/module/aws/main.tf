@@ -114,6 +114,18 @@ resource "aws_security_group" "stg_vpc_k8s_sg" {
   description = "STG VPC K8S Security Group."
   ingress {
     protocol = "tcp"
+    from_port = 22
+    to_port = 22
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    protocol = "tcp"
+    from_port = 6443
+    to_port = 6443
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    protocol = "tcp"
     from_port = 30080
     to_port = 30080
     cidr_blocks = ["0.0.0.0/0"]
@@ -147,7 +159,7 @@ resource "aws_instance" "stg_ec2_k8s_mtr_1" {
   instance_initiated_shutdown_behavior = "stop"
   instance_type = "t3a.small"
   key_name = var.stg_ec2_key_pair
-  security_groups = [aws_security_group.stg_vpc_k8s_sg.id]
+  vpc_security_group_ids = [aws_security_group.stg_vpc_k8s_sg.id]
   subnet_id = aws_subnet.stg_vpc_k8s_sn_1.id
   associate_public_ip_address = true
   private_ip = "10.2.11.10"
@@ -173,7 +185,7 @@ resource "aws_instance" "stg_ec2_k8s_wkr_1" {
   instance_initiated_shutdown_behavior = "stop"
   instance_type = "t3a.small"
   key_name = var.stg_ec2_key_pair
-  security_groups = [aws_security_group.stg_vpc_k8s_sg.id]
+  vpc_security_group_ids = [aws_security_group.stg_vpc_k8s_sg.id]
   subnet_id = aws_subnet.stg_vpc_k8s_sn_2.id
   associate_public_ip_address = true
   private_ip = "10.2.12.10"
