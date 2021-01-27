@@ -15,6 +15,7 @@ spec:
       containers:
         - name: main
           image: sloopstash/app:v1
+          imagePullPolicy: Always
           volumeMounts:
             - name: opt-app
               mountPath: /opt/app
