@@ -1,0 +1,12 @@
+# configure docker.
+- name: configure docker
+  copy:
+    src: docker-daemon.json
+    dest: "{{k8s_master.docker_conf_dir}}/deamon.json"
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - restart docker service
+  tags:
+    - configure

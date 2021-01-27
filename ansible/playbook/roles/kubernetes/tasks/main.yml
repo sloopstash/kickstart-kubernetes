@@ -1,0 +1,5 @@
+# import tasks.
+- import_tasks: setup.yml
+- import_tasks: configure.yml
+- import_tasks: update.yml
+- import_tasks: start.yml

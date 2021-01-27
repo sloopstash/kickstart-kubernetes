@@ -1,0 +1,28 @@
+# Clone Kubernetes starter-kit from GitHub.
+- name: kubernetes starter-kit from github
+  git:
+    repo: "https://github.com/sloopstash/kickstart-kubernetes.git"
+    dest: /opt/kickstart-kubernetes
+    version: master
+    force: yes
+  tags:
+    - update
+
+# Download sample CRM app within Kubernetes starter-kit directory.
+- name: download sample crm app within kubernetes starter-kit directory
+  git:
+    repo: "https://github.com/sloopstash/kickstart-flask.git"
+    dest: /opt/kickstart-kubernetes/app
+    version: master
+    force: yes
+  tags:
+    - update
+
+# Configure sample CRM app.
+- name: configure sample crm app
+  replace:
+    path: /opt/kickstart-kubernetes/app/config/redis.conf
+    regexp: "crm-redis"
+    replace: "redis"
+  tags:
+    - update

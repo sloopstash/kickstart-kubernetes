@@ -1,0 +1,5 @@
+k8s_master:
+  docker_conf_dir: /etc/docker
+  kernel_conf_dir: /etc/sysctl.d
+  kube_client_dir: /home/ec2-user/.kube
+  flannel_network_dir: /opt/kickstart-kubernetes/aws/ec2/network

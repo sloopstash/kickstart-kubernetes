@@ -11,4 +11,5 @@ app/*
 **/terraform.tfstate.d/*
 .terraform.lock.hcl
 *.log
-
+*.pem
+*.pub

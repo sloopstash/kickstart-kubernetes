@@ -1,0 +1,9 @@
+galaxy_info:
+  author: SloopStash DevOps
+  description: A role to manage Master node.
+  company: SloopStash
+  license: Apache License 2.0
+  min_ansible_version: 2.7.0
+  galaxy_tags: []
+dependencies: []
+allow_duplicates: false

@@ -1,0 +1,7 @@
+- hosts: k8s_master
+  roles:
+    - kubernetes
+
+- hosts: k8s_worker
+  roles:
+    - kubernetes
