@@ -9,8 +9,7 @@ terraform {
 }
 
 module "aws" {
-  source  = "./modules/aws"
-
+  source = "./module/aws"
   env = var.env
   stg_vpc_cidr_blk = var.stg_vpc_cidr_blk
   stg_ec2_key_pair = var.stg_ec2_key_pair
