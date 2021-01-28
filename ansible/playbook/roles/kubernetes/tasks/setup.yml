@@ -13,7 +13,7 @@
     group: root
     mode: 0600
   notify:
-    - restart docker service
+    - restart docker
   tags:
     - setup
 
