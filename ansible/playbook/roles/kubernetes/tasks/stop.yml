@@ -1,6 +1,6 @@
 # stop kubernetes agent.
 - name: stop kubernetes agent
-  command: systemctl stop kublet.service
+  command: systemctl stop kubelet.service
   tags:
     - stop
 

@@ -6,6 +6,6 @@
 
 # start kubernetes agent.
 - name: start kubernetes agent
-  command: systemctl start kublet.service
+  command: systemctl start kubelet.service
   tags:
     - start

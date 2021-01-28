@@ -6,6 +6,6 @@
 
 # restart kubernetes agent.
 - name: restart kubernetes agent
-  command: systemctl restart docker.service
+  command: systemctl restart kubelet.service
   tags:
     - restart
