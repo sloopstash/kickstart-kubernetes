@@ -41,6 +41,7 @@
   become_user: ec2-user
   run_once: true
   when: inventory_hostname in groups['kubernetes_master']
+  ignore_errors: yes
   delegate_to: stg-ec2-k8s-mtr-1
   tags:
     - configure
