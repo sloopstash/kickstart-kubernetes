@@ -12,14 +12,15 @@
     owner: root
     group: root
     mode: 0600
-  notify:
-    - restart docker
   tags:
     - setup
 
 # enable docker service at boot.
 - name: enable docker service at boot
-  command: systemctl enable docker.service
+  command: "{{item}}"
+  loop:
+    - systemctl enable docker.service
+    - systemctl start docker.service
   tags:
     - setup
 
