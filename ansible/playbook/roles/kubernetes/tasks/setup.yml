@@ -79,6 +79,8 @@
     group: ec2-user
     recurse: true
     mode: 0755
+  run_once: true
+  when: inventory_hostname in groups['kubernetes_master']
   tags:
     - setup
 
