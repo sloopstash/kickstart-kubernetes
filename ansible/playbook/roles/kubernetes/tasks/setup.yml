@@ -1,56 +1,83 @@
 # install docker.
 - name: install docker
-  command: "{{item}}"
-  loop:
-    - amazon-linux-extras install docker -y
-  notify:
-    - enable docker service at boot
+  command: amazon-linux-extras install docker -y
   tags:
     - setup
 
-# enable netfilter module.
-- name: enable netfilter module 
-  command: "{{item}}"
-  loop:
-    - modprobe br_netfilter
+# configure docker.
+- name: configure docker
+  copy:
+    src: docker/daemon.json
+    dest: "{{kubernetes.docker.conf_dir}}/daemon.json"
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - restart docker service
+  tags:
+    - setup
+
+# enable docker service at boot.
+- name: enable docker service at boot
+  command: systemctl enable docker.service
+  tags:
+    - setup
+
+# enable netfilter kernel module.
+- name: enable netfilter kernel module
+  command: modprobe br_netfilter
   tags:
     - setup
 
 # set required network and swap kernel params.
-- name: set network and swap kernel params
+- name: set required network and swap kernel params
   copy:
-    src: k8s.conf
-    dest: "{{k8s_master.kernel_conf_dir}}/k8s.conf"
+    src: kernel.conf
+    dest: /etc/sysctl.d/kubernetes.conf
     owner: root
     group: root
     mode: 0600
-  notify:
-    - apply required network and swap kernel params
   tags:
     - setup
 
-# Add Kubernetes repository to package manager source list.
+# apply required network and swap kernel params.
+- name: apply required network and swap kernel params
+  command: sysctl --system
+  tags:
+    - setup
+
+# add kubernetes repository to package manager source list.
 - name: add kubernetes repository to package manager source list
   copy:
-    src: kubernetes.repo
-    dest: "/etc/yum.repos.d/kubernetes.repo"
+    src: yum.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
     owner: root
     group: root
     mode: 0600
   tags:
     - setup
 
-# Install Kubernetes packages from repository.
+# install kubernetes packages from repository.
 - name: install kubernetes packages from repository
   yum:
     name:
-      - kubelet-1.19.4
-      - kubeadm-1.19.4
-      - kubectl-1.19.4
+      - kubelet-{{kubernetes.version}}
+      - kubeadm-{{kubernetes.version}}
+      - kubectl-{{kubernetes.version}}
     state: present
     disable_excludes: kubernetes
-  notify:
-    - enable kublet service at boot
+  tags:
+    - setup
+
+# create kubernetes client configuration directory.
+- name: create kubernetes client configuration directory
+  file:
+    path: "{{kubernetes.client.conf_dir}}"
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+    recurse: true
+    mode: 0755
   tags:
     - setup
 
@@ -59,17 +86,5 @@
   yum:
     name: git
     state: present
-  tags:
-    - setup
-
-# create kube client directory.
-- name: create kube client directory
-  file:
-    path: "{{k8s_master.kube_client_dir}}"
-    state: directory
-    owner: ec2-user
-    group: ec2-user
-    recurse: true
-    mode: 0755
   tags:
     - setup

@@ -1,55 +1,11 @@
-# initialize kubernetes cluster.
-- name: initialize kubernetes cluster
-  command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_eth0.ipv4.address }} --apiserver-cert-extra-sans={{k8s_master.apiserver_advertise_address}}"
-  register: kubeadm_init_output
-  run_once: true
-  when: inventory_hostname in groups['k8s_master']
-  delegate_to: stg-ec2-k8s-mtr-1
+# start docker.
+- name: start docker
+  command: systemctl start docker.service
   tags:
     - start
 
- # Configure Kubernetes client with admin user credentials.
-- name: configure kubernetes client with admin user credentials
-  copy:
-    src: /etc/kubernetes/admin.conf
-    dest: "{{k8s_master.kube_client_dir}}/config"
-    owner: ec2-user
-    group: ec2-user
-    remote_src: yes
-  run_once: true
-  when: inventory_hostname in groups['k8s_master']
-  delegate_to: stg-ec2-k8s-mtr-1
-  tags:
-    - start
-
- # Create Flannel network in Kubernetes cluster.
-- name: create flannel network in kubernetes cluster
-  command: "{{item}}"
-  loop:
-    - "kubectl apply -f {{k8s_master.flannel_network_dir}}/flannel.yml"
-    - "kubectl taint nodes --all node-role.kubernetes.io/master-"
-  become: yes
-  become_user: ec2-user
-  run_once: true
-  when: inventory_hostname in groups['k8s_master']
-  delegate_to: stg-ec2-k8s-mtr-1
-  tags:
-    - start
-
-# Generate toke to join worker node.
-- name: generate toke to join worker node
-  command: "kubeadm token create --kubeconfig=/etc/kubernetes/admin.conf --print-join-command"
-  register: wkr_nd_join_cmd
-  run_once: true
-  when: inventory_hostname in groups['k8s_master']
-  delegate_to: stg-ec2-k8s-mtr-1
-  tags:
-    - start
-
-# Join worker node.
-- name: join worker node
-  command: "{{hostvars['stg-ec2-k8s-mtr-1']['wkr_nd_join_cmd']['stdout']}}"
-  run_once: true
-  when: inventory_hostname in groups['k8s_worker']
+# start kubernetes agent.
+- name: start kubernetes agent
+  command: systemctl start kublet.service
   tags:
     - start

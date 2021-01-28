@@ -1,4 +1,0 @@
-# group variables.
-k8s_master:
-  environment: stg
-  apiserver_advertise_address: 10.2.11.10

@@ -1,3 +1,0 @@
-# group variables.
-k8s_worker:
-  environment: stg

@@ -1,26 +1,11 @@
-# apply required network and swap kernel params.
-- name: apply required network and swap kernel params
-  command: "{{item}}"
-  loop:
-    - swapoff -a
-    - sysctl --system
-
-# enable docker service at boot.
-- name: enable docker service at boot
-  command: systemctl enable docker.service
-
-# restart docker service.
-- name: restart docker service
+# restart docker.
+- name: restart docker
   command: systemctl restart docker.service
   tags:
     - restart
 
-# enable kublet service at boot.
-- name: enable kublet service at boot
-  command: systemctl enable kubelet.service
-
-# restart kublet service.
-- name: restart kublet service
-  command: systemctl restart kubelet.service
+# restart kubernetes agent.
+- name: restart kubernetes agent
+  command: systemctl restart docker.service
   tags:
     - restart

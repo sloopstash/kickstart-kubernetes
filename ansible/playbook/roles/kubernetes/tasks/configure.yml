@@ -1,12 +1,95 @@
-# configure docker.
-- name: configure docker
+# initialize kubernetes cluster.
+- name: initialize kubernetes cluster
+  command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ansible_eth0.ipv4.address}}
+  run_once: true
+  when: inventory_hostname in groups['kubernetes_master']
+  delegate_to: stg-ec2-k8s-mtr-1
+  tags:
+    - configure
+
+# configure kubernetes client with admin user credentials.
+- name: configure kubernetes client with admin user credentials
   copy:
-    src: docker-daemon.json
-    dest: "{{k8s_master.docker_conf_dir}}/deamon.json"
+    src: /etc/kubernetes/admin.conf
+    dest: "{{kubernetes.client.conf_dir}}/config"
+    owner: ec2-user
+    group: ec2-user
+    remote_src: yes
+  run_once: true
+  when: inventory_hostname in groups['kubernetes_master']
+  delegate_to: stg-ec2-k8s-mtr-1
+  tags:
+    - configure
+
+# create flannel network in kubernetes cluster.
+- name: create flannel network in kubernetes cluster
+  command: kubectl apply -f {{kubernetes.network.flannel}}
+  become: yes
+  become_user: ec2-user
+  run_once: true
+  when: inventory_hostname in groups['kubernetes_master']
+  delegate_to: stg-ec2-k8s-mtr-1
+  tags:
+    - configure
+
+# enable master kubernetes node to run pods.
+- name: enable master kubernetes node to run pods
+  command: kubectl taint nodes --all node-role.kubernetes.io/master-
+  become: yes
+  become_user: ec2-user
+  run_once: true
+  when: inventory_hostname in groups['kubernetes_master']
+  delegate_to: stg-ec2-k8s-mtr-1
+  tags:
+    - configure
+
+# generate token in kubernetes cluster.
+- name: generate token in kubernetes cluster
+  command: kubeadm token create --kubeconfig=/etc/kubernetes/admin.conf --print-join-command
+  register: kubernetes-worker-join-cmd
+  run_once: true
+  when: inventory_hostname in groups['kubernetes_master']
+  delegate_to: stg-ec2-k8s-mtr-1
+  tags:
+    - configure
+
+# join worker kubernetes node to the cluster.
+- name: join worker kubernetes node to the cluster
+  command: "{{hostvars['stg-ec2-k8s-mtr-1']['kubernetes-worker-join-cmd']['stdout']}}"
+  run_once: true
+  when: inventory_hostname in groups['kubernetes_worker']
+  tags:
+    - configure
+
+# download kubernetes starter-kit from github.
+- name: download kubernetes starter-kit from github
+  git:
+    repo: https://github.com/sloopstash/kickstart-kubernetes.git
+    version: master
+    dest: "{{kubernetes.starter_kit_dir}}"
+    update: yes
+    force: yes
+  tags:
+    - configure
+
+# fetch app git repository.
+- name: fetch app git repository
+  git:
+    repo: https://github.com/sloopstash/kickstart-flask.git
+    version: master
+    dest: "{{kubernetes.starter_kit_dir}}/app"
+    update: yes
+    force: yes
+  tags:
+    - configure
+
+# configure app for redis.
+- name: configure app for redis
+  template:
+    src: redis.conf.j2
+    dest: "{{kubernetes.starter_kit_dir}}/app/config/redis.conf"
     owner: root
     group: root
     mode: 0600
-  notify:
-    - restart docker service
   tags:
     - configure

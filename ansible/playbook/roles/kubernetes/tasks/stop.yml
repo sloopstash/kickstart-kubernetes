@@ -1,0 +1,11 @@
+# stop kubernetes agent.
+- name: stop kubernetes agent
+  command: systemctl stop kublet.service
+  tags:
+    - stop
+
+# stop docker.
+- name: stop docker
+  command: systemctl stop docker.service
+  tags:
+    - stop
