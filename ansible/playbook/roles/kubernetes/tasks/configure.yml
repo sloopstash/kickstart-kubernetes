@@ -1,6 +1,8 @@
 # initialize kubernetes cluster.
 - name: initialize kubernetes cluster
   command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ansible_eth0.ipv4.address}}
+  args:
+    creates: /etc/kubernetes/admin.conf
   run_once: true
   when: inventory_hostname in groups['kubernetes_master']
   delegate_to: stg-ec2-k8s-mtr-1
@@ -56,6 +58,8 @@
 # join worker kubernetes node to the cluster.
 - name: join worker kubernetes node to the cluster
   command: "{{hostvars['stg-ec2-k8s-mtr-1']['kubernetes-worker-join-cmd']['stdout']}}"
+  args:
+    creates: /etc/kubernetes/kubelet.conf
   run_once: true
   when: inventory_hostname in groups['kubernetes_worker']
   tags:
