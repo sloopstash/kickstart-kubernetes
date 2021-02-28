@@ -1,11 +1,11 @@
-# install docker.
-- name: install docker
+# Install Docker.
+- name: Install Docker
   command: amazon-linux-extras install docker -y
   tags:
     - setup
 
-# configure docker.
-- name: configure docker
+# Configure Docker.
+- name: Configure Docker
   copy:
     src: docker/daemon.json
     dest: "{{kubernetes.docker.conf_dir}}/daemon.json"
@@ -15,8 +15,8 @@
   tags:
     - setup
 
-# enable docker service at boot.
-- name: enable docker service at boot
+# Enable Docker service at boot.
+- name: Enable Docker service at boot
   command: "{{item}}"
   loop:
     - systemctl enable docker.service
@@ -24,14 +24,14 @@
   tags:
     - setup
 
-# enable netfilter kernel module.
-- name: enable netfilter kernel module
+# Enable netfilter Linux kernel module.
+- name: Enable netfilter Linux kernel module
   command: modprobe br_netfilter
   tags:
     - setup
 
-# set required network and swap kernel params.
-- name: set required network and swap kernel params
+# Set required network and swap Linux kernel params.
+- name: Set required network and swap Linux kernel params
   copy:
     src: kernel.conf
     dest: /etc/sysctl.d/kubernetes.conf
@@ -41,14 +41,14 @@
   tags:
     - setup
 
-# apply required network and swap kernel params.
-- name: apply required network and swap kernel params
+# Apply required network and swap Linux kernel params.
+- name: Apply required network and swap Linux kernel params
   command: sysctl --system
   tags:
     - setup
 
-# add kubernetes repository to package manager source list.
-- name: add kubernetes repository to package manager source list
+# Add Kubernetes repository to package manager source list.
+- name: Add Kubernetes repository to package manager source list
   copy:
     src: yum.repo
     dest: /etc/yum.repos.d/kubernetes.repo
@@ -58,8 +58,8 @@
   tags:
     - setup
 
-# install kubernetes packages from repository.
-- name: install kubernetes packages from repository
+# Install Kubernetes packages from repository.
+- name: Install Kubernetes packages from repository
   yum:
     name:
       - kubelet-{{kubernetes.version}}
@@ -70,8 +70,8 @@
   tags:
     - setup
 
-# create kubernetes client configuration directory.
-- name: create kubernetes client configuration directory
+# Create Kubernetes client configuration directory.
+- name: Create Kubernetes client configuration directory
   file:
     path: "{{kubernetes.client.conf_dir}}"
     state: directory
@@ -84,8 +84,8 @@
   tags:
     - setup
 
-# install git.
-- name: install git
+# Install Git.
+- name: Install Git
   yum:
     name: git
     state: present

@@ -1,1 +1,1 @@
-- place self-signed ssl certificates and keys that are used by kubernetes client.
+- Place self-signed SSL certificates and keys that are used by Kubernetes client.

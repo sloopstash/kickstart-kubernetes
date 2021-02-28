@@ -1,11 +1,11 @@
-# restart docker.
-- name: restart docker
+# Restart Docker.
+- name: Restart Docker
   command: systemctl restart docker.service
   tags:
     - restart
 
-# restart kubernetes agent.
-- name: restart kubernetes agent
+# Restart Kubernetes agent.
+- name: Restart Kubernetes agent
   command: systemctl restart kubelet.service
   tags:
     - restart
