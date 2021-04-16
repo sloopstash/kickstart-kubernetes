@@ -17,18 +17,18 @@ spec:
           image: sloopstash/app:v1
           imagePullPolicy: Always
           volumeMounts:
-            - name: opt-app
-              mountPath: /opt/app
-            - name: etc-nginx-nginx-conf
-              mountPath: /etc/nginx/nginx.conf
-            - name: etc-nginx-conf-d-app-conf
-              mountPath: /etc/nginx/conf.d/app.conf
-            - name: etc-supervisord-conf
+            - name: supervisor-server
               mountPath: /etc/supervisord.conf
-            - name: etc-supervisord-d-app-ini
+            - name: app-supervisor
               mountPath: /etc/supervisord.d/app.ini
-            - name: etc-supervisord-d-nginx-ini
+            - name: nginx-supervisor
               mountPath: /etc/supervisord.d/nginx.ini
+            - name: nginx-server
+              mountPath: /etc/nginx/nginx.conf
+            - name: app-nginx
+              mountPath: /etc/nginx/conf.d/app.conf
+            - name: app-source
+              mountPath: /opt/app
           command:
             - "/usr/bin/supervisord"
             - "-c"
@@ -36,27 +36,27 @@ spec:
           ports:
             - containerPort: 80
       volumes:
-        - name: opt-app
-          hostPath:
-            path: /opt/kickstart-kubernetes/app
-            type: Directory
-        - name: etc-nginx-nginx-conf
-          hostPath:
-            path: /opt/kickstart-kubernetes/nginx/conf/main.conf
-            type: File
-        - name: etc-nginx-conf-d-app-conf
-          hostPath:
-            path: /opt/kickstart-kubernetes/nginx/conf/app.conf
-            type: File
-        - name: etc-supervisord-conf
+        - name: supervisor-server
           hostPath:
             path: /opt/kickstart-kubernetes/supervisor/conf/main.conf
             type: File
-        - name: etc-supervisord-d-app-ini
+        - name: app-supervisor
           hostPath:
             path: /opt/kickstart-kubernetes/supervisor/conf/app.ini
             type: File
-        - name: etc-supervisord-d-nginx-ini
+        - name: nginx-supervisor
           hostPath:
             path: /opt/kickstart-kubernetes/supervisor/conf/nginx.ini
             type: File
+        - name: nginx-server
+          hostPath:
+            path: /opt/kickstart-kubernetes/nginx/conf/main.conf
+            type: File
+        - name: app-nginx
+          hostPath:
+            path: /opt/kickstart-kubernetes/nginx/conf/app.conf
+            type: File
+        - name: app-source
+          hostPath:
+            path: /opt/kickstart-kubernetes/app
+            type: Directory
