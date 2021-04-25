@@ -6,6 +6,7 @@ spec:
   storageClassName: manual
   capacity:
     storage: 5Gi
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce 
   persistentVolumeReclaimPolicy: Retain
@@ -18,6 +19,7 @@ metadata:
   name: redis-data
 spec:
   storageClassName: manual
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   resources:
@@ -32,6 +34,7 @@ spec:
   storageClassName: manual
   capacity:
     storage: 1Gi
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce 
   persistentVolumeReclaimPolicy: Retain
@@ -44,6 +47,7 @@ metadata:
   name: redis-log
 spec:
   storageClassName: manual
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   resources:
