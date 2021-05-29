@@ -33,6 +33,18 @@ spec:
             - "/etc/supervisord.conf"
           ports:
             - containerPort: 6379
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - "/usr/local/bin/redis-cli"
+                - "PING"
+            initialDelaySeconds: 15
+            periodSeconds: 20
         - name: log
           image: sloopstash/redis:v1
           volumeMounts:

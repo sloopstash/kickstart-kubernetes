@@ -35,6 +35,24 @@ spec:
             - "/etc/supervisord.conf"
           ports:
             - containerPort: 80
+          readinessProbe:
+            exec:
+              command:
+                - "/usr/bin/supervisorctl"
+                - "status"
+                - "nginx"
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /health
+              port: 80
+              httpHeaders:
+              - name: Host
+                value: app.crm
+            initialDelaySeconds: 15
+            periodSeconds: 20
       volumes:
         - name: supervisor-server
           hostPath:
