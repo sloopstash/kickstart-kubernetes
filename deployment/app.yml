@@ -49,8 +49,8 @@ spec:
               path: /health
               port: 80
               httpHeaders:
-              - name: Host
-                value: app.crm
+                - name: Host
+                  value: app.crm
             initialDelaySeconds: 15
             periodSeconds: 20
       volumes:
