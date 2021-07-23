@@ -1,3 +1,3 @@
-output "stg_aws" {
+output "aws" {
   value = module.aws
 }

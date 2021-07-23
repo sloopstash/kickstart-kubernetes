@@ -1,12 +1,12 @@
 variable "env" {
   type = string
-  description = "CRM Environment."
+  description = "Environment."
 }
-variable "stg_vpc_cidr_blk" {
+variable "ssh_public_key" {
   type = string
-  description = "STG VPC CIDR Block."
+  description = "SSH public key."
 }
-variable "stg_ec2_key_pair" {
+variable "aws_s3_bucket_prefix" {
   type = string
-  description = "STG EC2 Key Pair."
+  description = "AWS S3 bucket prefix."
 }

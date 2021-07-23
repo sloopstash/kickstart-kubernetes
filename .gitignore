@@ -12,4 +12,5 @@ app/*
 .terraform.lock.hcl
 *.log
 *.pem
+*node
 *.pub

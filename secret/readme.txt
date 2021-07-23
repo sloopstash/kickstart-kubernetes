@@ -1,1 +1,2 @@
 - Place self-signed SSL certificates and keys that are used by Kubernetes client.
+- Place SSH keys of Kubernetes nodes.
