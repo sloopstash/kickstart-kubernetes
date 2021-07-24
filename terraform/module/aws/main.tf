@@ -103,6 +103,15 @@ resource "aws_route_table" "vpc_pvt_rtt" {
     Region = data.aws_region.current.name
   }
 }
+resource "aws_route" "vpc_pvt_rtt_rt_1" {
+  depends_on = [
+    aws_route_table.vpc_pvt_rtt,
+    aws_instance.ec2_nat_sr_1
+  ]
+  route_table_id = aws_route_table.vpc_pvt_rtt.id
+  destination_cidr_block = "0.0.0.0/0"
+  instance_id = aws_instance.ec2_nat_sr_1.id
+}
 resource "aws_subnet" "vpc_kubernetes_sn_1" {
   depends_on = [aws_vpc.vpc_net]
   vpc_id = aws_vpc.vpc_net.id
@@ -345,6 +354,35 @@ resource "aws_key_pair" "ec2_key_pair" {
     Region = data.aws_region.current.name
   }
 }
+resource "aws_instance" "ec2_nat_sr_1" {
+  depends_on = [
+    aws_iam_instance_profile.iam_ec2_rl_inst_pf,
+    aws_vpc.vpc_net,
+    aws_subnet.vpc_nat_sn_2,
+    aws_security_group.vpc_nat_sg
+  ]
+  ami = "ami-0a4bc8a5c1ed3b5a3"
+  availability_zone = "${data.aws_region.current.name}d"
+  tenancy = "default"
+  ebs_optimized = false
+  disable_api_termination = false
+  instance_initiated_shutdown_behavior = "stop"
+  instance_type = "t3a.nano"
+  key_name = aws_key_pair.ec2_key_pair.id
+  vpc_security_group_ids = [aws_security_group.vpc_nat_sg.id]
+  subnet_id = aws_subnet.vpc_nat_sn_2.id
+  associate_public_ip_address = true
+  source_dest_check = false
+  iam_instance_profile = aws_iam_instance_profile.iam_ec2_rl_inst_pf.id
+  credit_specification {
+    cpu_credits = "standard"
+  }
+  tags = {
+    Name = "ec2-nat-sr-1"
+    Environment = var.env
+    Region = data.aws_region.current.name
+  }
+}
 resource "aws_opsworks_stack" "osw_kubernetes_stk" {
   depends_on = [
     aws_iam_instance_profile.iam_ec2_rl_inst_pf,
@@ -405,13 +443,18 @@ resource "aws_opsworks_custom_layer" "osw_kubernetes_1_lr" {
   custom_json = jsonencode({
     kubernetes = {
       cluster = 1
+      token = null
+      token_hash = null
+      master = {
+        ip_address = null
+      }
     }
   })
-  custom_setup_recipes = ["system::setup","kubernetes::setup"]
+  custom_setup_recipes = ["system::setup","docker::setup","kubernetes::setup"]
   custom_configure_recipes = []
   custom_deploy_recipes = []
   custom_undeploy_recipes = []
-  custom_shutdown_recipes = ["kubernetes::stop","system::stop"]
+  custom_shutdown_recipes = ["docker::stop","kubernetes::stop","system::stop"]
   ebs_volume {
     mount_point = "/mnt/kubernetes"
     raid_level = "None"
