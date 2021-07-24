@@ -1,2 +1,4 @@
-## Kubernetes Cookbook
-A cookbook to deploy Kubernetes.
+Docker Cookbook
+===============
+
+Deploy and manage Docker service in the machine.
