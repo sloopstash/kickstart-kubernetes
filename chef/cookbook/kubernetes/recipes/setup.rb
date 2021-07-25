@@ -3,11 +3,12 @@ system_group = node['system']['group']
 version = node['kubernetes']['version']
 hostname = node['hostname']
 
-client_conf_dir = node['kubernetes']['client']['conf_dir']
+user_home_dir = "/home/#{system_user}"
+client_conf_dir = "#{user_home_dir}/.kube"
 
 repo_conf_path = node['kubernetes']['repo']['conf_path']
 
-# Add Kubernetes repository to package manager source list.
+# Add Kubernetes repository.
 template repo_conf_path do
   source 'yum.repo.erb'
   owner 'root'
@@ -17,26 +18,16 @@ template repo_conf_path do
   action 'create'
 end
 
-# Install Kubernetes.
-yum_package 'Install Kubernetes' do
-  package_name [
-    "kubelet-#{version}",
-    "kubeadm-#{version}",
-    "kubectl-#{version}"
-  ]
-  action 'install'
-end
-
-if hostname.include?('-mtr-')
+if hostname.include?('-mtr-1')
   # Install Kubernetes.
-  yum_package 'Install Kubernetes' do
-    package_name [
-      "kubelet-#{version}",
-      "kubeadm-#{version}",
-      "kubectl-#{version}"
-    ]
-    action 'install'
+  execute 'Install Kubernetes' do
+    command "yum install -y kubelet-#{version} kubeadm-#{version} kubectl-#{version}"
+    user 'root'
+    group 'root'
+    returns [0]
+    action 'run'
   end
+
   # Create Kubernetes client configuration directory.
   directory client_conf_dir do
     owner system_user
@@ -50,11 +41,15 @@ if hostname.include?('-mtr-')
   end
 else
   # Install Kubernetes.
-  yum_package 'Install Kubernetes' do
-    package_name [
-      "kubelet-#{version}",
-      "kubeadm-#{version}"
-    ]
-    action 'install'
+  execute 'Install Kubernetes' do
+    command "yum install -y kubelet-#{version} kubeadm-#{version}"
+    user 'root'
+    group 'root'
+    returns [0]
+    action 'run'
   end
 end
+
+# Include recipes.
+include_recipe 'kubernetes::configure'
+include_recipe 'kubernetes::start'

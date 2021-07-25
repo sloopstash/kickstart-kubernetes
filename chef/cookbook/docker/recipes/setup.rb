@@ -6,3 +6,7 @@ execute 'Install Docker' do
   returns [0]
   action 'run'
 end
+
+# Include recipes.
+include_recipe 'docker::configure'
+include_recipe 'docker::start'

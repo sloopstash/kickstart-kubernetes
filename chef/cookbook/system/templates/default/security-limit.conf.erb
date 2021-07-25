@@ -1,0 +1,4 @@
+root - nofile  <%=@params['open_files']%>
+root - memlock <%=@params['memory_lock']%>
+<%=@system_user%> - nofile  <%=@params['open_files']%>
+<%=@system_user%> - memlock <%=@params['memory_lock']%>

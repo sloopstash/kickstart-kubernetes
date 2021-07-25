@@ -22,5 +22,15 @@ execute 'Enable netfilter Linux kernel module' do
   action 'run'
 end
 
+# Disable Linux swap memory.
+execute 'Disable Linux swap memory' do
+  command 'swapoff -a'
+  user 'root'
+  group 'root'
+  returns [0]
+  action 'run'
+end
+
+# Include recipes.
 include_recipe 'system::configure'
 include_recipe 'system::start'

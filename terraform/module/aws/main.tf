@@ -420,6 +420,10 @@ resource "aws_opsworks_stack" "osw_kubernetes_stk" {
     ])
   }
   custom_json = jsonencode({
+    system = {
+      user = "ec2-user"
+      group = "ec2-user"
+    }
     kubernetes = {
       environment = var.env
       component = "kubernetes"
