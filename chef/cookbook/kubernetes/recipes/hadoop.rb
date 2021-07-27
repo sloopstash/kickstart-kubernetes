@@ -8,10 +8,22 @@ deploy_dir = '/opt/kickstart-hadoop'
 git deploy_dir do
   repository repo_url
   revision 'master'
-  user system_user
-  group system_group
+  user 'root'
+  group 'root'
   enable_checkout false
   action 'sync'
+end
+
+# Change ownership of Hadoop starter-kit directory.
+execute 'Change ownership of Hadoop starter-kit directory' do
+  command "chown -R #{system_user}:#{system_group} #{deploy_dir}"
+  user 'root'
+  group 'root'
+  returns [0]
+  action 'run'
+  only_if do
+    File.exists?deploy_dir
+  end
 end
 
 # Create Hadoop storage paths.
