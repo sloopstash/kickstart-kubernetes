@@ -458,7 +458,7 @@ resource "aws_opsworks_custom_layer" "osw_kubernetes_1_lr" {
   custom_configure_recipes = []
   custom_deploy_recipes = []
   custom_undeploy_recipes = []
-  custom_shutdown_recipes = ["docker::stop","kubernetes::stop","system::stop"]
+  custom_shutdown_recipes = ["kubernetes::stop","docker::stop","system::stop"]
   ebs_volume {
     mount_point = "/mnt/kubernetes"
     raid_level = "None"
