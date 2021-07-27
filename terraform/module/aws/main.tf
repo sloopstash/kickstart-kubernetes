@@ -241,9 +241,9 @@ resource "aws_security_group" "vpc_kubernetes_sg" {
     security_groups = [aws_security_group.vpc_loadbalancer_sg.id]
   }
   ingress {
-    protocol = "tcp"
+    protocol = "-1"
     from_port = 0
-    to_port = 65535
+    to_port = 0
     self = true
   }
   ingress {
