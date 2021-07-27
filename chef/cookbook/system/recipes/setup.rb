@@ -13,6 +13,12 @@ execute 'Disable Postfix service' do
   end
 end
 
+# Install Git.
+yum_package 'Install Git' do
+  package_name ['git']
+  action 'install'
+end
+
 # Enable netfilter Linux kernel module.
 execute 'Enable netfilter Linux kernel module' do
   command 'modprobe br_netfilter'
