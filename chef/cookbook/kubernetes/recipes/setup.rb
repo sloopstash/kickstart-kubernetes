@@ -3,9 +3,6 @@ system_group = node['system']['group']
 version = node['kubernetes']['version']
 hostname = node['hostname']
 
-user_home_dir = "/home/#{system_user}"
-client_conf_dir = "#{user_home_dir}/.kube"
-
 repo_conf_path = node['kubernetes']['repo']['conf_path']
 
 # Add Kubernetes repository.
@@ -18,7 +15,10 @@ template repo_conf_path do
   action 'create'
 end
 
-if hostname.include?('-mtr-1')
+if hostname.include?('-mtr-')
+  user_home_dir = "/home/#{system_user}"
+  client_conf_dir = "#{user_home_dir}/.kube"
+
   # Install Kubernetes.
   execute 'Install Kubernetes' do
     command "yum install -y kubelet-#{version} kubeadm-#{version} kubectl-#{version}"

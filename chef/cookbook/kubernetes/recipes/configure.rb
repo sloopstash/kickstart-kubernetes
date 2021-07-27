@@ -4,7 +4,7 @@ hostname = node['hostname']
 
 conf_dir = node['kubernetes']['conf_dir']
 
-if hostname.include?('-mtr-')
+if hostname.include?('-mtr-1')
   ip_address = node['ipaddress']
   flannel_template_url = node['kubernetes']['flannel']['template_url']
   user_home_dir = "/home/#{system_user}"
