@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: redis
 spec:
@@ -7,15 +7,49 @@ spec:
     matchLabels:
       service: redis
   replicas: 1
+  serviceName: redis
   template:
     metadata:
       labels:
         service: redis
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-c
       containers:
         - name: main
           image: sloopstash/redis:v1
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
@@ -47,6 +81,7 @@ spec:
             periodSeconds: 20
         - name: log
           image: sloopstash/redis:v1
+          imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
@@ -75,3 +110,24 @@ spec:
         - name: redis-log
           persistentVolumeClaim:
             claimName: redis-log
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        storageClassName: redis-data
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
+    - metadata:
+        name: redis-log
+      spec:
+        storageClassName: redis-log
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

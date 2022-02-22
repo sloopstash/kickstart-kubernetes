@@ -12,6 +12,39 @@ spec:
       labels:
         service: app
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-b
       containers:
         - name: main
           image: sloopstash/app:v1

@@ -3,53 +3,91 @@ kind: PersistentVolume
 metadata:
   name: redis-data
 spec:
-  storageClassName: manual
+  storageClassName: redis-data
   capacity:
-    storage: 5Gi
+    storage: 2Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce 
   persistentVolumeReclaimPolicy: Retain
-  hostPath:
-    path: /mnt/redis/data
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: redis-data
-spec:
-  storageClassName: manual
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 3Gi
+  local:
+    path: /mnt/kubernetes/redis/data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+          - key: provider
+            operator: In
+            values:
+              - host
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+          - key: region
+            operator: In
+            values:
+              - local
+          - key: availability_zone
+            operator: In
+            values:
+              - local-c
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: redis-log
 spec:
-  storageClassName: manual
+  storageClassName: redis-log
   capacity:
     storage: 1Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce 
   persistentVolumeReclaimPolicy: Retain
-  hostPath:
-    path: /mnt/redis/log
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: redis-log
-spec:
-  storageClassName: manual
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
+  local:
+    path: /mnt/kubernetes/redis/log
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+          - key: provider
+            operator: In
+            values:
+              - host
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+          - key: region
+            operator: In
+            values:
+              - local
+          - key: availability_zone
+            operator: In
+            values:
+              - local-c
