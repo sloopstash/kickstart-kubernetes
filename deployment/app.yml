@@ -52,14 +52,19 @@ spec:
           volumeMounts:
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
             - name: app-supervisor
               mountPath: /etc/supervisord.d/app.ini
+              subPath: app-supervisor
             - name: nginx-supervisor
               mountPath: /etc/supervisord.d/nginx.ini
+              subPath: nginx-supervisor
             - name: nginx-server
               mountPath: /etc/nginx/nginx.conf
+              subPath: nginx-server
             - name: app-nginx
               mountPath: /etc/nginx/conf.d/app.conf
+              subPath: app-nginx
             - name: app-source
               mountPath: /opt/app
           command:
@@ -88,25 +93,20 @@ spec:
             periodSeconds: 20
       volumes:
         - name: supervisor-server
-          hostPath:
-            path: /opt/kickstart-kubernetes/supervisor/conf/main.conf
-            type: File
+          configMap:
+            name: app
         - name: app-supervisor
-          hostPath:
-            path: /opt/kickstart-kubernetes/supervisor/conf/app.ini
-            type: File
+          configMap:
+            name: app
         - name: nginx-supervisor
-          hostPath:
-            path: /opt/kickstart-kubernetes/supervisor/conf/nginx.ini
-            type: File
+          configMap:
+            name: app
         - name: nginx-server
-          hostPath:
-            path: /opt/kickstart-kubernetes/nginx/conf/main.conf
-            type: File
+          configMap:
+            name: app
         - name: app-nginx
-          hostPath:
-            path: /opt/kickstart-kubernetes/nginx/conf/app.conf
-            type: File
+          configMap:
+            name: app
         - name: app-source
           hostPath:
             path: /opt/kickstart-kubernetes/app
