@@ -22,10 +22,10 @@ execute 'Enable Docker service at boot' do
 end
 
 # Enable Kubernetes Docker CRI service at boot.
-execute 'Enable Kubernetes Docker CRI service at boot' do
-  command 'systemctl enable cri-docker.service'
-  user 'root'
-  group 'root'
-  returns [0]
-  action 'run'
-end
+# execute 'Enable Kubernetes Docker CRI service at boot' do
+#   command 'systemctl enable cri-docker.service'
+#   user 'root'
+#   group 'root'
+#   returns [0]
+#   action 'run'
+# end

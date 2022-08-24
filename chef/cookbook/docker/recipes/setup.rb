@@ -19,13 +19,13 @@ remote_file "/tmp/cri-dockerd.rpm" do
 end
 
 # Install Kubernetes Docker CRI.
-yum_package 'Install Kubernetes Docker CRI' do
-  source "/tmp/cri-dockerd.rpm"
-  action :install
-  not_if do
-    File.exists?"/usr/bin/cri-dockerd"
-  end
-end
+# yum_package 'Install Kubernetes Docker CRI' do
+#   source "/tmp/cri-dockerd.rpm"
+#   action :install
+#   not_if do
+#     File.exists?"/usr/bin/cri-dockerd"
+#   end
+# end
 
 # Include recipes.
 include_recipe 'docker::configure'
