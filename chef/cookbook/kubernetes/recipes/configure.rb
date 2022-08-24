@@ -4,6 +4,7 @@ hostname = node['hostname']
 
 conf_dir = node['kubernetes']['conf_dir']
 
+cri_conf_path = node['kubernetes']['cri']['conf_path']
 cri_socket_path = node['kubernetes']['cri']['socket_path']
 
 if hostname.include?('-mtr-1')
@@ -93,4 +94,17 @@ else
       File.exists?agent_conf_path
     end
   end
+end
+
+# Configure Kubernetes CRI client.
+template cri_conf_path do
+  source 'cri/client.yml.erb'
+  owner 'root'
+  group 'root'
+  variables(
+    'socket_path'=>cri_socket_path
+  )
+  mode 0600
+  backup false
+  action 'create'
 end
