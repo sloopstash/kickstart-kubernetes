@@ -9,9 +9,18 @@ execute 'Install Docker' do
   action 'run'
 end
 
+# Download Kubernetes Docker CRI.
+remote_file "/tmp/cri-dockerd.rpm" do
+  source kubernetes_cri_package_url
+  mode 0644
+  not_if do
+    File.exists?"/tmp/cri-dockerd.rpm"
+  end
+end
+
 # Install Kubernetes Docker CRI.
 yum_package 'Install Kubernetes Docker CRI' do
-  source kubernetes_cri_package_url
+  source "/tmp/cri-dockerd.rpm"
   action :install
   not_if do
     File.exists?"/usr/bin/cri-dockerd"
