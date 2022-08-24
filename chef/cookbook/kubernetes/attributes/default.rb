@@ -1,8 +1,9 @@
 # Cookbook attributes.
-default['kubernetes']['version'] = '1.19.4-0'
+default['kubernetes']['version'] = '1.24.3'
 default['kubernetes']['cluster'] = 1
 default['kubernetes']['conf_dir'] = '/etc/kubernetes'
 default['kubernetes']['repo']['conf_path'] = '/etc/yum.repos.d/kubernetes.repo'
+default['kubernetes']['cri']['socket_path'] = 'unix:///run/cri-dockerd.sock'
 default['kubernetes']['flannel']['template_url'] = 'https://github.com/sloopstash/kickstart-kubernetes/raw/master/aws/ec2/network/flannel.yml'
 default['kubernetes']['flannel']['conf_path'] = '/etc/cni/net.d/10-flannel.conflist'
 default['kubernetes']['token'] = nil

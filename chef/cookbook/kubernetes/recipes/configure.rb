@@ -4,6 +4,8 @@ hostname = node['hostname']
 
 conf_dir = node['kubernetes']['conf_dir']
 
+cri_socket_path = node['kubernetes']['cri']['socket_path']
+
 if hostname.include?('-mtr-1')
   ip_address = node['ipaddress']
   flannel_template_url = node['kubernetes']['flannel']['template_url']
@@ -15,7 +17,7 @@ if hostname.include?('-mtr-1')
 
   # Initialize Kubernetes cluster.
   execute 'Initialize Kubernetes cluster' do
-    command "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=#{ip_address}"
+    command "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=#{ip_address} --cri-socket=#{cri_socket_path}"
     user 'root'
     group 'root'
     returns [0]
@@ -82,7 +84,7 @@ else
 
   # Join worker Kubernetes node.
   execute 'Join worker Kubernetes node' do
-    command "kubeadm join #{master_ip_address}:6443 --token #{token} --discovery-token-ca-cert-hash #{token_hash}"
+    command "kubeadm join #{master_ip_address}:6443 --token #{token} --discovery-token-ca-cert-hash #{token_hash} --cri-socket=#{cri_socket_path}"
     user 'root'
     group 'root'
     returns [0]
