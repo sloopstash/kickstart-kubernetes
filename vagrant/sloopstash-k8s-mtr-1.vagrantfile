@@ -78,7 +78,7 @@ Vagrant.configure("2") do |config|
   # information on available options.
 
   # VirtualBox guest addition configuration.
-  config.vbguest.installer_options = { allow_kernel_upgrade: true }
+  # config.vbguest.installer_options = { allow_kernel_upgrade: true }
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
