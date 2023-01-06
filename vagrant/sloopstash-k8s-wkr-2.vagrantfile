@@ -87,8 +87,14 @@ Vagrant.configure("2") do |config|
     yum install -y wget vim net-tools initscripts gcc make tar bind-utils nc git unzip
     systemctl stop postfix.service
     systemctl disable postfix.service
-    mkdir -p /mnt/kubernetes/redis/data
-    mkdir -p /mnt/kubernetes/redis/log
+    mkdir -p /mnt/kubernetes/crm/qaa/redis/data
+    mkdir -p /mnt/kubernetes/crm/qaa/redis/log
+    mkdir -p /mnt/kubernetes/crm/qab/redis/data
+    mkdir -p /mnt/kubernetes/crm/qab/redis/log
+    mkdir -p /mnt/kubernetes/crm/stg/redis/data
+    mkdir -p /mnt/kubernetes/crm/stg/redis/log
+    mkdir -p /mnt/kubernetes/crm/prd/redis/data
+    mkdir -p /mnt/kubernetes/crm/prd/redis/log
     chmod -R ugo+rwx /mnt/kubernetes
   SHELL
 end

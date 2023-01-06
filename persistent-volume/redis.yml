@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: redis-data
+  name: crm-${ENVIRONMENT}-redis-data
 spec:
-  storageClassName: redis-data
+  storageClassName: crm-${ENVIRONMENT}-redis-data
   capacity:
     storage: 2Gi
   volumeMode: Filesystem
@@ -11,7 +11,7 @@ spec:
     - ReadWriteOnce 
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/kubernetes/redis/data
+    path: /mnt/kubernetes/crm/${ENVIRONMENT}/redis/data
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -48,9 +48,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: redis-log
+  name: crm-${ENVIRONMENT}-redis-log
 spec:
-  storageClassName: redis-log
+  storageClassName: crm-${ENVIRONMENT}-redis-log
   capacity:
     storage: 1Gi
   volumeMode: Filesystem
@@ -58,7 +58,7 @@ spec:
     - ReadWriteOnce 
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/kubernetes/redis/log
+    path: /mnt/kubernetes/crm/${ENVIRONMENT}/redis/log
   nodeAffinity:
     required:
       nodeSelectorTerms:
