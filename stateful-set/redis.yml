@@ -115,7 +115,7 @@ spec:
     - metadata:
         name: redis-data
       spec:
-        storageClassName: redis-data
+        storageClassName: crm-${ENVIRONMENT}-redis-data
         volumeMode: Filesystem
         accessModes:
           - ReadWriteOnce
@@ -125,7 +125,7 @@ spec:
     - metadata:
         name: redis-log
       spec:
-        storageClassName: redis-log
+        storageClassName: crm-${ENVIRONMENT}-redis-log
         volumeMode: Filesystem
         accessModes:
           - ReadWriteOnce

@@ -8,7 +8,7 @@ spec:
   type: NodePort
   ports:
     - port: 80
-      nodePort: 30080
+      nodePort: ${APP_NODE_PORT}
       targetPort: 80
       protocol: TCP
   selector:
