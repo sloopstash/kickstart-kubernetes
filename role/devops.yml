@@ -7,7 +7,12 @@ rules:
       - ''
       - apps
     resources:
+      - persistentvolumeclaims
+      - configmaps
+      - statefulsets
       - deployments
+      - replicasets
+      - daemonsets
       - pods
     verbs:
       - get
@@ -30,7 +35,6 @@ rules:
       - patch
       - delete
   - apiGroups:
-      - extensions
       - networking.k8s.io
     resources:
       - ingresses
