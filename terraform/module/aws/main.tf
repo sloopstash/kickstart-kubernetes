@@ -8,7 +8,6 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "iam_ec2_rl" {
-  depends_on = [aws_s3_bucket.s3_osw_chef_bkt]
   name = "iam-ec2-rl"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -20,30 +19,13 @@ resource "aws_iam_role" "iam_ec2_rl" {
       Action = "sts:AssumeRole"
     }]
   })
-  inline_policy {
-    name = "s3"
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [{
-        Sid = "001"
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject"
-        ]
-        Resource = [
-          join(":::",[
-            "arn:aws:s3",
-            "${aws_s3_bucket.s3_osw_chef_bkt.id}/*"
-          ])
-        ]
-      }]
-    })
-  }
+  force_detach_policies = false
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
     "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   ]
+  max_session_duration = 3600
   path = "/"
   tags = {
     Name = "iam-ec2-rl"
@@ -53,8 +35,9 @@ resource "aws_iam_role" "iam_ec2_rl" {
 }
 resource "aws_iam_instance_profile" "iam_ec2_rl_inst_pf" {
   depends_on = [aws_iam_role.iam_ec2_rl]
-  role = aws_iam_role.iam_ec2_rl.name
+  name = "iam-ec2-rl-inst-pf"
   path = "/"
+  role = aws_iam_role.iam_ec2_rl.name
   tags = {
     Name = "iam-ec2-rl-inst-pf"
     Environment = var.env
@@ -73,9 +56,11 @@ resource "aws_iam_role" "iam_eks_rl" {
       Action = "sts:AssumeRole"
     }]
   })
+  force_detach_policies = false
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   ]
+  max_session_duration = 3600
   path = "/"
   tags = {
     Name = "iam-eks-rl"
@@ -83,12 +68,23 @@ resource "aws_iam_role" "iam_eks_rl" {
     Region = data.aws_region.current.name
   }
 }
+resource "aws_iam_instance_profile" "iam_eks_rl_inst_pf" {
+  depends_on = [aws_iam_role.iam_eks_rl]
+  name = "iam-eks-rl-inst-pf"
+  path = "/"
+  role = aws_iam_role.iam_eks_rl.name
+  tags = {
+    Name = "iam-eks-rl-inst-pf"
+    Environment = var.env
+    Region = data.aws_region.current.name
+  }
+}
 resource "aws_vpc" "vpc_net" {
   cidr_block = "10.0.0.0/16"
-  enable_dns_support = true
-  enable_dns_hostnames = true
-  enable_classiclink = false
   instance_tenancy = "default"
+  enable_dns_support = true
+  enable_network_address_usage_metrics = false
+  enable_dns_hostnames = true
   assign_generated_ipv6_cidr_block = false
   tags = {
     Name = "vpc-net"
@@ -137,127 +133,20 @@ resource "aws_route" "vpc_pvt_rtt_rt_1" {
   ]
   route_table_id = aws_route_table.vpc_pvt_rtt.id
   destination_cidr_block = "0.0.0.0/0"
-  instance_id = aws_instance.ec2_nat_sr_1.id
-}
-resource "aws_subnet" "vpc_kubernetes_sn_1" {
-  depends_on = [aws_vpc.vpc_net]
-  vpc_id = aws_vpc.vpc_net.id
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "${data.aws_region.current.name}a"
-  tags = {
-    Name = "vpc-kubernetes-sn-1"
-    Environment = var.env
-    Region = data.aws_region.current.name
-  }
-}
-resource "aws_route_table_association" "vpc_kubernetes_sn_1_rtt_ass" {
-  depends_on = [
-    aws_subnet.vpc_kubernetes_sn_1,
-    aws_route_table.vpc_pvt_rtt
-  ]
-  subnet_id = aws_subnet.vpc_kubernetes_sn_1.id
-  route_table_id = aws_route_table.vpc_pvt_rtt.id
-}
-resource "aws_subnet" "vpc_kubernetes_sn_2" {
-  depends_on = [aws_vpc.vpc_net]
-  vpc_id = aws_vpc.vpc_net.id
-  cidr_block = "10.0.2.0/24"
-  availability_zone = "${data.aws_region.current.name}b"
-  tags = {
-    Name = "vpc-kubernetes-sn-2"
-    Environment = var.env
-    Region = data.aws_region.current.name
-  }
-}
-resource "aws_route_table_association" "vpc_kubernetes_sn_2_rtt_ass" {
-  depends_on = [
-    aws_subnet.vpc_kubernetes_sn_2,
-    aws_route_table.vpc_pvt_rtt
-  ]
-  subnet_id = aws_subnet.vpc_kubernetes_sn_2.id
-  route_table_id = aws_route_table.vpc_pvt_rtt.id
-}
-resource "aws_subnet" "vpc_nat_sn_1" {
-  depends_on = [aws_vpc.vpc_net]
-  vpc_id = aws_vpc.vpc_net.id
-  cidr_block = "10.0.3.0/24"
-  availability_zone = "${data.aws_region.current.name}c"
-  tags = {
-    Name = "vpc-nat-sn-1"
-    Environment = var.env
-    Region = data.aws_region.current.name
-  }
-}
-resource "aws_route_table_association" "vpc_nat_sn_1_rtt_ass" {
-  depends_on = [
-    aws_subnet.vpc_nat_sn_1,
-    aws_route_table.vpc_pub_rtt
-  ]
-  subnet_id = aws_subnet.vpc_nat_sn_1.id
-  route_table_id = aws_route_table.vpc_pub_rtt.id
-}
-resource "aws_subnet" "vpc_nat_sn_2" {
-  depends_on = [aws_vpc.vpc_net]
-  vpc_id = aws_vpc.vpc_net.id
-  cidr_block = "10.0.4.0/24"
-  availability_zone = "${data.aws_region.current.name}d"
-  tags = {
-    Name = "vpc-nat-sn-2"
-    Environment = var.env
-    Region = data.aws_region.current.name
-  }
-}
-resource "aws_route_table_association" "vpc_nat_sn_2_rtt_ass" {
-  depends_on = [
-    aws_subnet.vpc_nat_sn_2,
-    aws_route_table.vpc_pub_rtt
-  ]
-  subnet_id = aws_subnet.vpc_nat_sn_2.id
-  route_table_id = aws_route_table.vpc_pub_rtt.id
-}
-resource "aws_subnet" "vpc_loadbalancer_sn_1" {
-  depends_on = [aws_vpc.vpc_net]
-  vpc_id = aws_vpc.vpc_net.id
-  cidr_block = "10.0.5.0/24"
-  availability_zone = "${data.aws_region.current.name}a"
-  tags = {
-    Name = "vpc-loadbalancer-sn-1"
-    Environment = var.env
-    Region = data.aws_region.current.name
-  }
-}
-resource "aws_route_table_association" "vpc_loadbalancer_sn_1_rtt_ass" {
-  depends_on = [
-    aws_subnet.vpc_loadbalancer_sn_1,
-    aws_route_table.vpc_pub_rtt
-  ]
-  subnet_id = aws_subnet.vpc_loadbalancer_sn_1.id
-  route_table_id = aws_route_table.vpc_pub_rtt.id
-}
-resource "aws_subnet" "vpc_loadbalancer_sn_2" {
-  depends_on = [aws_vpc.vpc_net]
-  vpc_id = aws_vpc.vpc_net.id
-  cidr_block = "10.0.6.0/24"
-  availability_zone = "${data.aws_region.current.name}b"
-  tags = {
-    Name = "vpc-loadbalancer-sn-2"
-    Environment = var.env
-    Region = data.aws_region.current.name
-  }
-}
-resource "aws_route_table_association" "vpc_loadbalancer_sn_2_rtt_ass" {
-  depends_on = [
-    aws_subnet.vpc_loadbalancer_sn_2,
-    aws_route_table.vpc_pub_rtt
-  ]
-  subnet_id = aws_subnet.vpc_loadbalancer_sn_2.id
-  route_table_id = aws_route_table.vpc_pub_rtt.id
+  network_interface_id = aws_instance.ec2_nat_sr_1.primary_network_interface_id
 }
 resource "aws_subnet" "vpc_eks_cp_sn_1" {
   depends_on = [aws_vpc.vpc_net]
-  vpc_id = aws_vpc.vpc_net.id
-  cidr_block = "10.0.7.0/24"
+  assign_ipv6_address_on_creation = false
   availability_zone = "${data.aws_region.current.name}a"
+  cidr_block = "10.0.1.0/24"
+  enable_dns64 = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  enable_resource_name_dns_a_record_on_launch = false
+  map_customer_owned_ip_on_launch = false
+  map_public_ip_on_launch = false
+  private_dns_hostname_type_on_launch = "ip-name"
+  vpc_id = aws_vpc.vpc_net.id
   tags = {
     Name = "vpc-eks-cp-sn-1"
     Environment = var.env
@@ -274,9 +163,16 @@ resource "aws_route_table_association" "vpc_eks_cp_sn_1_rtt_ass" {
 }
 resource "aws_subnet" "vpc_eks_cp_sn_2" {
   depends_on = [aws_vpc.vpc_net]
-  vpc_id = aws_vpc.vpc_net.id
-  cidr_block = "10.0.8.0/24"
+  assign_ipv6_address_on_creation = false
   availability_zone = "${data.aws_region.current.name}b"
+  cidr_block = "10.0.2.0/24"
+  enable_dns64 = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  enable_resource_name_dns_a_record_on_launch = false
+  map_customer_owned_ip_on_launch = false
+  map_public_ip_on_launch = false
+  private_dns_hostname_type_on_launch = "ip-name"
+  vpc_id = aws_vpc.vpc_net.id
   tags = {
     Name = "vpc-eks-cp-sn-2"
     Environment = var.env
@@ -293,9 +189,16 @@ resource "aws_route_table_association" "vpc_eks_cp_sn_2_rtt_ass" {
 }
 resource "aws_subnet" "vpc_eks_nd_sn_1" {
   depends_on = [aws_vpc.vpc_net]
+  assign_ipv6_address_on_creation = false
+  availability_zone = "${data.aws_region.current.name}c"
+  cidr_block = "10.0.3.0/24"
+  enable_dns64 = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  enable_resource_name_dns_a_record_on_launch = false
+  map_customer_owned_ip_on_launch = false
+  map_public_ip_on_launch = false
+  private_dns_hostname_type_on_launch = "ip-name"
   vpc_id = aws_vpc.vpc_net.id
-  cidr_block = "10.0.9.0/24"
-  availability_zone = "${data.aws_region.current.name}a"
   tags = {
     Name = "vpc-eks-nd-sn-1"
     Environment = var.env
@@ -312,9 +215,16 @@ resource "aws_route_table_association" "vpc_eks_nd_sn_1_rtt_ass" {
 }
 resource "aws_subnet" "vpc_eks_nd_sn_2" {
   depends_on = [aws_vpc.vpc_net]
+  assign_ipv6_address_on_creation = false
+  availability_zone = "${data.aws_region.current.name}d"
+  cidr_block = "10.0.4.0/24"
+  enable_dns64 = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  enable_resource_name_dns_a_record_on_launch = false
+  map_customer_owned_ip_on_launch = false
+  map_public_ip_on_launch = false
+  private_dns_hostname_type_on_launch = "ip-name"
   vpc_id = aws_vpc.vpc_net.id
-  cidr_block = "10.0.10.0/24"
-  availability_zone = "${data.aws_region.current.name}b"
   tags = {
     Name = "vpc-eks-nd-sn-2"
     Environment = var.env
@@ -329,19 +239,118 @@ resource "aws_route_table_association" "vpc_eks_nd_sn_2_rtt_ass" {
   subnet_id = aws_subnet.vpc_eks_nd_sn_2.id
   route_table_id = aws_route_table.vpc_pvt_rtt.id
 }
-resource "aws_security_group" "vpc_kubernetes_sg" {
-  depends_on = [
-    aws_vpc.vpc_net,
-    aws_security_group.vpc_loadbalancer_sg,
-    aws_security_group.vpc_nat_sg
-  ]
+resource "aws_subnet" "vpc_nat_sn_1" {
+  depends_on = [aws_vpc.vpc_net]
+  assign_ipv6_address_on_creation = false
+  availability_zone = "${data.aws_region.current.name}a"
+  cidr_block = "10.0.5.0/24"
+  enable_dns64 = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  enable_resource_name_dns_a_record_on_launch = false
+  map_customer_owned_ip_on_launch = false
+  map_public_ip_on_launch = false
+  private_dns_hostname_type_on_launch = "ip-name"
   vpc_id = aws_vpc.vpc_net.id
-  name = "vpc-kubernetes-sg"
-  ingress {
-    protocol = "tcp"
-    from_port = 6443
-    to_port = 6443
-    security_groups = [aws_security_group.vpc_loadbalancer_sg.id]
+  tags = {
+    Name = "vpc-nat-sn-1"
+    Environment = var.env
+    Region = data.aws_region.current.name
+  }
+}
+resource "aws_route_table_association" "vpc_nat_sn_1_rtt_ass" {
+  depends_on = [
+    aws_subnet.vpc_nat_sn_1,
+    aws_route_table.vpc_pub_rtt
+  ]
+  subnet_id = aws_subnet.vpc_nat_sn_1.id
+  route_table_id = aws_route_table.vpc_pub_rtt.id
+}
+resource "aws_subnet" "vpc_nat_sn_2" {
+  depends_on = [aws_vpc.vpc_net]
+  assign_ipv6_address_on_creation = false
+  availability_zone = "${data.aws_region.current.name}b"
+  cidr_block = "10.0.6.0/24"
+  enable_dns64 = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  enable_resource_name_dns_a_record_on_launch = false
+  map_customer_owned_ip_on_launch = false
+  map_public_ip_on_launch = false
+  private_dns_hostname_type_on_launch = "ip-name"
+  vpc_id = aws_vpc.vpc_net.id
+  tags = {
+    Name = "vpc-nat-sn-2"
+    Environment = var.env
+    Region = data.aws_region.current.name
+  }
+}
+resource "aws_route_table_association" "vpc_nat_sn_2_rtt_ass" {
+  depends_on = [
+    aws_subnet.vpc_nat_sn_2,
+    aws_route_table.vpc_pub_rtt
+  ]
+  subnet_id = aws_subnet.vpc_nat_sn_2.id
+  route_table_id = aws_route_table.vpc_pub_rtt.id
+}
+resource "aws_subnet" "vpc_loadbalancer_sn_1" {
+  depends_on = [aws_vpc.vpc_net]
+  assign_ipv6_address_on_creation = false
+  availability_zone = "${data.aws_region.current.name}c"
+  cidr_block = "10.0.7.0/24"
+  enable_dns64 = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  enable_resource_name_dns_a_record_on_launch = false
+  map_customer_owned_ip_on_launch = false
+  map_public_ip_on_launch = false
+  private_dns_hostname_type_on_launch = "ip-name"
+  vpc_id = aws_vpc.vpc_net.id
+  tags = {
+    Name = "vpc-loadbalancer-sn-1"
+    Environment = var.env
+    Region = data.aws_region.current.name
+  }
+}
+resource "aws_route_table_association" "vpc_loadbalancer_sn_1_rtt_ass" {
+  depends_on = [
+    aws_subnet.vpc_loadbalancer_sn_1,
+    aws_route_table.vpc_pub_rtt
+  ]
+  subnet_id = aws_subnet.vpc_loadbalancer_sn_1.id
+  route_table_id = aws_route_table.vpc_pub_rtt.id
+}
+resource "aws_subnet" "vpc_loadbalancer_sn_2" {
+  depends_on = [aws_vpc.vpc_net]
+  assign_ipv6_address_on_creation = false
+  availability_zone = "${data.aws_region.current.name}d"
+  cidr_block = "10.0.8.0/24"
+  enable_dns64 = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  enable_resource_name_dns_a_record_on_launch = false
+  map_customer_owned_ip_on_launch = false
+  map_public_ip_on_launch = false
+  private_dns_hostname_type_on_launch = "ip-name"
+  vpc_id = aws_vpc.vpc_net.id
+  tags = {
+    Name = "vpc-loadbalancer-sn-2"
+    Environment = var.env
+    Region = data.aws_region.current.name
+  }
+}
+resource "aws_route_table_association" "vpc_loadbalancer_sn_2_rtt_ass" {
+  depends_on = [
+    aws_subnet.vpc_loadbalancer_sn_2,
+    aws_route_table.vpc_pub_rtt
+  ]
+  subnet_id = aws_subnet.vpc_loadbalancer_sn_2.id
+  route_table_id = aws_route_table.vpc_pub_rtt.id
+}
+resource "aws_security_group" "vpc_eks_sg" {
+  depends_on = [aws_vpc.vpc_net]
+  name = "vpc-eks-sg"
+  egress {
+    protocol = "-1"
+    from_port = 0
+    to_port = 0
+    cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
     protocol = "-1"
@@ -349,28 +358,23 @@ resource "aws_security_group" "vpc_kubernetes_sg" {
     to_port = 0
     self = true
   }
-  ingress {
-    protocol = "tcp"
-    from_port = 22
-    to_port = 22
-    security_groups = [aws_security_group.vpc_nat_sg.id]
-  }
-  egress {
-    protocol = "-1"
-    from_port = 0
-    to_port = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  revoke_rules_on_delete = false
+  vpc_id = aws_vpc.vpc_net.id
   tags = {
-    Name = "vpc-kubernetes-sg"
+    Name = "vpc-eks-sg"
     Environment = var.env
     Region = data.aws_region.current.name
   }
 }
 resource "aws_security_group" "vpc_nat_sg" {
   depends_on = [aws_vpc.vpc_net]
-  vpc_id = aws_vpc.vpc_net.id
   name = "vpc-nat-sg"
+  egress {
+    protocol = "-1"
+    from_port = 0
+    to_port = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   ingress {
     protocol = "-1"
     from_port = 0
@@ -383,12 +387,8 @@ resource "aws_security_group" "vpc_nat_sg" {
     to_port = 22
     cidr_blocks = ["0.0.0.0/0"]
   }
-  egress {
-    protocol = "-1"
-    from_port = 0
-    to_port = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  revoke_rules_on_delete = false
+  vpc_id = aws_vpc.vpc_net.id
   tags = {
     Name = "vpc-nat-sg"
     Environment = var.env
@@ -397,78 +397,26 @@ resource "aws_security_group" "vpc_nat_sg" {
 }
 resource "aws_security_group" "vpc_loadbalancer_sg" {
   depends_on = [aws_vpc.vpc_net]
-  vpc_id = aws_vpc.vpc_net.id
   name = "vpc-loadbalancer-sg"
-  ingress {
-    protocol = "tcp"
-    from_port = 443
-    to_port = 443
-    cidr_blocks = ["0.0.0.0/0"]
-  }
   egress {
     protocol = "-1"
     from_port = 0
     to_port = 0
     cidr_blocks = [aws_vpc.vpc_net.cidr_block]
   }
+  ingress {
+    protocol = "tcp"
+    from_port = 443
+    to_port = 443
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  revoke_rules_on_delete = false
+  vpc_id = aws_vpc.vpc_net.id
   tags = {
     Name = "vpc-loadbalancer-sg"
     Environment = var.env
     Region = data.aws_region.current.name
   }
-}
-resource "aws_security_group" "vpc_eks_sg" {
-  depends_on = [aws_vpc.vpc_net]
-  vpc_id = aws_vpc.vpc_net.id
-  name = "vpc-eks-sg"
-  ingress {
-    protocol = "-1"
-    from_port = 0
-    to_port = 0
-    self = true
-  }
-  egress {
-    protocol = "-1"
-    from_port = 0
-    to_port = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags = {
-    Name = "vpc-eks-sg"
-    Environment = var.env
-    Region = data.aws_region.current.name
-  }
-}
-resource "aws_s3_bucket" "s3_osw_chef_bkt" {
-  bucket = "${var.aws_s3_bucket_prefix}-${var.env}-s3-osw-chef-bkt"
-  acl = "private"
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
-  cors_rule {
-    allowed_origins = ["*"]
-    allowed_methods = ["GET","HEAD"]
-    allowed_headers = ["*"]
-    expose_headers = []
-    max_age_seconds = 86400
-  }
-  tags = {
-    Name = "s3-osw-chef-bkt"
-    Environment = var.env
-    Region = data.aws_region.current.name
-  }
-}
-resource "aws_s3_bucket_public_access_block" "s3_osw_chef_bkt_pub_acs_blk" {
-  depends_on = [aws_s3_bucket.s3_osw_chef_bkt]
-  bucket = aws_s3_bucket.s3_osw_chef_bkt.id
-  block_public_acls = true
-  block_public_policy = true
-  ignore_public_acls = true
-  restrict_public_buckets = true 
 }
 resource "aws_key_pair" "ec2_key_pair" {
   key_name = "ec2-key-pair"
@@ -487,30 +435,42 @@ resource "aws_instance" "ec2_nat_sr_1" {
     aws_security_group.vpc_nat_sg
   ]
   ami = "ami-0a4bc8a5c1ed3b5a3"
-  availability_zone = "${data.aws_region.current.name}d"
-  tenancy = "default"
-  ebs_optimized = false
-  disable_api_termination = false
-  instance_initiated_shutdown_behavior = "stop"
-  instance_type = "t3a.nano"
-  key_name = aws_key_pair.ec2_key_pair.id
-  vpc_security_group_ids = [aws_security_group.vpc_nat_sg.id]
-  subnet_id = aws_subnet.vpc_nat_sn_2.id
   associate_public_ip_address = true
-  source_dest_check = false
-  iam_instance_profile = aws_iam_instance_profile.iam_ec2_rl_inst_pf.id
+  cpu_options {
+    core_count = 1
+    threads_per_core = 2
+  }
   credit_specification {
     cpu_credits = "standard"
   }
+  disable_api_stop = false
+  disable_api_termination = false
+  ebs_optimized = false
+  hibernation = false
+  iam_instance_profile = aws_iam_instance_profile.iam_ec2_rl_inst_pf.id
+  instance_initiated_shutdown_behavior = "stop"
+  instance_type = "t3a.micro"
+  key_name = aws_key_pair.ec2_key_pair.id
+  monitoring = false
+  private_dns_name_options {
+    enable_resource_name_dns_aaaa_record = true
+    enable_resource_name_dns_a_record = true
+    hostname_type = "ip-name"
+  }
+  vpc_security_group_ids = [aws_security_group.vpc_nat_sg.id]
+  source_dest_check = false
+  subnet_id = aws_subnet.vpc_nat_sn_2.id
+  tenancy = "default"
   tags = {
     Name = "ec2-nat-sr-1"
     Environment = var.env
     Region = data.aws_region.current.name
   }
 }
-resource "aws_eks_cluster" "eks-ct" {
+resource "aws_eks_cluster" "eks_ct" {
   depends_on = [
     aws_iam_role.iam_eks_rl,
+    aws_vpc.vpc_net,
     aws_subnet.vpc_eks_cp_sn_1,
     aws_subnet.vpc_eks_cp_sn_2,
     aws_subnet.vpc_eks_nd_sn_1,
@@ -531,100 +491,50 @@ resource "aws_eks_cluster" "eks-ct" {
     ]
   }
   version = 1.24
+  tags = {
+    Name = "eks-ct"
+    Environment = var.env
+    Region = data.aws_region.current.name
+  }
 }
-# resource "aws_opsworks_stack" "osw_kubernetes_stk" {
-#   depends_on = [
-#     aws_iam_instance_profile.iam_ec2_rl_inst_pf,
-#     aws_vpc.vpc_net,
-#     aws_subnet.vpc_kubernetes_sn_2,
-#     aws_s3_bucket.s3_osw_chef_bkt
-#   ]
-#   name = "osw-kubernetes-stk"
-#   region = data.aws_region.current.name
-#   default_availability_zone = "${data.aws_region.current.name}b"
-#   color = "rgb(186, 65, 50)"
-#   service_role_arn = join(":",[
-#     "arn:aws:iam:",
-#     data.aws_caller_identity.current.account_id,
-#     "role/aws-opsworks-service-role"
-#   ])
-#   default_instance_profile_arn = aws_iam_instance_profile.iam_ec2_rl_inst_pf.arn
-#   vpc_id = aws_vpc.vpc_net.id
-#   default_subnet_id = aws_subnet.vpc_kubernetes_sn_2.id
-#   use_opsworks_security_groups = false
-#   default_os = "Custom"
-#   default_root_device_type = "ebs"
-#   hostname_theme = "Layer_Dependent"
-#   default_ssh_key_name = "ec2-key-pair"
-#   agent_version = "LATEST"
-#   configuration_manager_name = "Chef"
-#   configuration_manager_version = "12"
-#   use_custom_cookbooks = true
-#   custom_cookbooks_source {
-#     type = "s3"
-#     url = join("/",[
-#       "https://s3.amazonaws.com",
-#       aws_s3_bucket.s3_osw_chef_bkt.id,
-#       "cookbooks.tar.gz"
-#     ])
-#   }
-#   custom_json = jsonencode({
-#     system = {
-#       user = "ec2-user"
-#       group = "ec2-user"
-#     }
-#     kubernetes = {
-#       environment = var.env
-#       component = "kubernetes"
-#     }
-#   })
-#   manage_berkshelf = false
-#   tags = {
-#     Environment = var.env
-#     Region = data.aws_region.current.name
-#   }
-# }
-# resource "aws_opsworks_custom_layer" "osw_kubernetes_1_lr" {
-#   depends_on = [
-#     aws_security_group.vpc_kubernetes_sg,
-#     aws_opsworks_stack.osw_kubernetes_stk
-#   ]
-#   name = "osw-kubernetes-1-lr"
-#   short_name = "osw-kubernetes-1-lr"
-#   stack_id = aws_opsworks_stack.osw_kubernetes_stk.id
-#   custom_security_group_ids = [aws_security_group.vpc_kubernetes_sg.id]
-#   custom_json = jsonencode({
-#     kubernetes = {
-#       cluster = 1
-#       token = null
-#       token_hash = null
-#       master = {
-#         ip_address = null
-#       }
-#     }
-#   })
-#   custom_setup_recipes = ["system::setup","docker::setup","kubernetes::setup"]
-#   custom_configure_recipes = []
-#   custom_deploy_recipes = []
-#   custom_undeploy_recipes = []
-#   custom_shutdown_recipes = ["kubernetes::stop","docker::stop","system::stop"]
-#   ebs_volume {
-#     mount_point = "/mnt/kubernetes"
-#     raid_level = "None"
-#     number_of_disks = 1
-#     size = 5
-#     type = "gp2"
-#     encrypted = true
-#   }
-#   auto_assign_elastic_ips = false
-#   auto_assign_public_ips = false
-#   auto_healing = false
-#   install_updates_on_boot = false
-#   instance_shutdown_timeout = 120
-#   drain_elb_on_shutdown = false
-#   use_ebs_optimized_instances = false
-#   tags = {
-#     Environment = var.env
-#     Region = data.aws_region.current.name
-#   }
-# }
+resource "aws_eks_node_group" "eks_gnr_ng" {
+  depends_on = [
+    aws_iam_role.iam_ec2_rl,
+    aws_vpc.vpc_net,
+    aws_subnet.vpc_eks_nd_sn_1,
+    aws_subnet.vpc_eks_nd_sn_2,
+    aws_security_group.vpc_nat_sg
+    aws_key_pair.ec2_key_pair,
+    aws_eks_cluster.eks_ct
+  ]
+  node_group_name = "eks-gnr-ng"
+  cluster_name = aws_eks_cluster.eks_ct.name
+  node_role_arn = aws_iam_role.iam_ec2_rl.arn
+  scaling_config {
+    desired_size = 2
+    max_size = 2
+    min_size = 1
+  }
+  subnet_ids = [
+    aws_subnet.vpc_eks_nd_sn_1.id,
+    aws_subnet.vpc_eks_nd_sn_2.id
+  ]
+  ami_type = "AL2_x86_64"
+  capacity_type = "ON_DEMAND"
+  disk_size = 8
+  force_update_version = true
+  instance_types = ["t3a.small"]
+  remote_access {
+    ec2_ssh_key = aws_key_pair.ec2_key_pair.id
+    source_security_group_ids = [aws_security_group.vpc_nat_sg.id]
+  }
+  update_config {
+    max_unavailable_percentage = 30
+  }
+  version = 1.24
+  tags = {
+    Name = "eks-gnr-ng"
+    Environment = var.env
+    Region = data.aws_region.current.name
+  }
+}
