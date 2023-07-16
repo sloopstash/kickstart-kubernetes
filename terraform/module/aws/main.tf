@@ -1,6 +1,6 @@
 provider "aws" {
   region = "us-west-2"
-  shared_credentials_file = "~/.aws/credentials"
+  shared_credentials_files = ["~/.aws/credentials"]
   profile = "tuto"
 }
 
@@ -143,7 +143,6 @@ resource "aws_subnet" "vpc_eks_cp_sn_1" {
   enable_dns64 = false
   enable_resource_name_dns_aaaa_record_on_launch = false
   enable_resource_name_dns_a_record_on_launch = false
-  map_customer_owned_ip_on_launch = false
   map_public_ip_on_launch = false
   private_dns_hostname_type_on_launch = "ip-name"
   vpc_id = aws_vpc.vpc_net.id
@@ -169,7 +168,6 @@ resource "aws_subnet" "vpc_eks_cp_sn_2" {
   enable_dns64 = false
   enable_resource_name_dns_aaaa_record_on_launch = false
   enable_resource_name_dns_a_record_on_launch = false
-  map_customer_owned_ip_on_launch = false
   map_public_ip_on_launch = false
   private_dns_hostname_type_on_launch = "ip-name"
   vpc_id = aws_vpc.vpc_net.id
@@ -195,7 +193,6 @@ resource "aws_subnet" "vpc_eks_nd_sn_1" {
   enable_dns64 = false
   enable_resource_name_dns_aaaa_record_on_launch = false
   enable_resource_name_dns_a_record_on_launch = false
-  map_customer_owned_ip_on_launch = false
   map_public_ip_on_launch = false
   private_dns_hostname_type_on_launch = "ip-name"
   vpc_id = aws_vpc.vpc_net.id
@@ -221,7 +218,6 @@ resource "aws_subnet" "vpc_eks_nd_sn_2" {
   enable_dns64 = false
   enable_resource_name_dns_aaaa_record_on_launch = false
   enable_resource_name_dns_a_record_on_launch = false
-  map_customer_owned_ip_on_launch = false
   map_public_ip_on_launch = false
   private_dns_hostname_type_on_launch = "ip-name"
   vpc_id = aws_vpc.vpc_net.id
@@ -247,7 +243,6 @@ resource "aws_subnet" "vpc_nat_sn_1" {
   enable_dns64 = false
   enable_resource_name_dns_aaaa_record_on_launch = false
   enable_resource_name_dns_a_record_on_launch = false
-  map_customer_owned_ip_on_launch = false
   map_public_ip_on_launch = false
   private_dns_hostname_type_on_launch = "ip-name"
   vpc_id = aws_vpc.vpc_net.id
@@ -273,7 +268,6 @@ resource "aws_subnet" "vpc_nat_sn_2" {
   enable_dns64 = false
   enable_resource_name_dns_aaaa_record_on_launch = false
   enable_resource_name_dns_a_record_on_launch = false
-  map_customer_owned_ip_on_launch = false
   map_public_ip_on_launch = false
   private_dns_hostname_type_on_launch = "ip-name"
   vpc_id = aws_vpc.vpc_net.id
@@ -299,7 +293,6 @@ resource "aws_subnet" "vpc_loadbalancer_sn_1" {
   enable_dns64 = false
   enable_resource_name_dns_aaaa_record_on_launch = false
   enable_resource_name_dns_a_record_on_launch = false
-  map_customer_owned_ip_on_launch = false
   map_public_ip_on_launch = false
   private_dns_hostname_type_on_launch = "ip-name"
   vpc_id = aws_vpc.vpc_net.id
@@ -325,7 +318,6 @@ resource "aws_subnet" "vpc_loadbalancer_sn_2" {
   enable_dns64 = false
   enable_resource_name_dns_aaaa_record_on_launch = false
   enable_resource_name_dns_a_record_on_launch = false
-  map_customer_owned_ip_on_launch = false
   map_public_ip_on_launch = false
   private_dns_hostname_type_on_launch = "ip-name"
   vpc_id = aws_vpc.vpc_net.id
@@ -503,7 +495,7 @@ resource "aws_eks_node_group" "eks_gnr_ng" {
     aws_vpc.vpc_net,
     aws_subnet.vpc_eks_nd_sn_1,
     aws_subnet.vpc_eks_nd_sn_2,
-    aws_security_group.vpc_nat_sg
+    aws_security_group.vpc_nat_sg,
     aws_key_pair.ec2_key_pair,
     aws_eks_cluster.eks_ct
   ]
