@@ -459,6 +459,38 @@ resource "aws_instance" "ec2_nat_sr_1" {
     Region = data.aws_region.current.name
   }
 }
+resource "aws_ecr_repository" "ecr_app_repo" {
+  name = "sloopstash/app"
+  encryption_configuration {
+    encryption_type = "AES256"
+  }
+  force_delete = true
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = false
+  }
+  tags = {
+    Name = "ecr-app-repo"
+    Environment = var.env
+    Region = data.aws_region.current.name
+  }
+}
+resource "aws_ecr_repository" "ecr_redis_repo" {
+  name = "sloopstash/redis"
+  encryption_configuration {
+    encryption_type = "AES256"
+  }
+  force_delete = true
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = false
+  }
+  tags = {
+    Name = "ecr-redis-repo"
+    Environment = var.env
+    Region = data.aws_region.current.name
+  }
+}
 resource "aws_eks_cluster" "eks_ct" {
   depends_on = [
     aws_iam_role.iam_eks_rl,
@@ -467,7 +499,8 @@ resource "aws_eks_cluster" "eks_ct" {
     aws_subnet.vpc_eks_cp_sn_2,
     aws_subnet.vpc_eks_nd_sn_1,
     aws_subnet.vpc_eks_nd_sn_2,
-    aws_security_group.vpc_eks_sg
+    aws_security_group.vpc_eks_sg,
+    aws_instance.ec2_nat_sr_1
   ]
   name = "eks-ct"
   role_arn = aws_iam_role.iam_eks_rl.arn
