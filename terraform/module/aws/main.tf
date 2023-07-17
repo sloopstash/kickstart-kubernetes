@@ -445,7 +445,7 @@ resource "aws_instance" "ec2_nat_sr_1" {
   key_name = aws_key_pair.ec2_key_pair.id
   monitoring = false
   private_dns_name_options {
-    enable_resource_name_dns_aaaa_record = true
+    enable_resource_name_dns_aaaa_record = false
     enable_resource_name_dns_a_record = true
     hostname_type = "ip-name"
   }
