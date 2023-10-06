@@ -1,2 +1,2 @@
 # Kickstart Kubernetes
-The ultimate aim of this Kubernetes starter-kit is to help you deploy a sample CRM app service and Redis database service on Docker containers in Kubernetes cluster.
+Our Kubernetes starter-kit repository contains Kubernetes YAML templates, Terraform configurations, Ansible playbooks & roles, Chef cookbooks, Vagrant VM configurations, workload-specific configurations, etc., required to automate and run containerized workloads in the Kubernetes cluster.
