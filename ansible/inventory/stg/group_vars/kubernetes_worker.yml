@@ -1,3 +1,0 @@
-# Group variables.
-kubernetes_worker:
-  environment: stg

@@ -1,5 +1,0 @@
-# Import tasks.
-- import_tasks: setup.yml
-- import_tasks: configure.yml
-- import_tasks: start.yml
-- import_tasks: stop.yml

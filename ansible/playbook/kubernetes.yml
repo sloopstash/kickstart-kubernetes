@@ -1,7 +1,0 @@
-- hosts: kubernetes_master
-  roles:
-    - kubernetes
-
-- hosts: kubernetes_worker
-  roles:
-    - kubernetes
