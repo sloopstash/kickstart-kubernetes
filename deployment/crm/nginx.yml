@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       service: nginx
-  replicas: 5
+  replicas: 2
   template:
     metadata:
       labels:
@@ -54,8 +54,8 @@ spec:
           volumeMounts:
             - name: app-source
               mountPath: /opt/app/source
-            - name: nginx-log
-              mountPath: /opt/nginx/log
+            # - name: nginx-log
+            #   mountPath: /opt/nginx/log
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
@@ -66,8 +66,8 @@ spec:
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx-server
             - name: app-nginx
-              configMap:
-                name: app
+              mountPath: /etc/nginx/conf.d/app.conf
+              subPath: app-nginx
           ports:
             - containerPort: 80
           livenessProbe:
@@ -93,9 +93,9 @@ spec:
           hostPath:
             path: ${CRM_APP_SOURCE}
             type: Directory
-        - name: nginx-log
-          persistentVolumeClaim:
-            claimName: sloopstash-${ENVIRONMENT}-crm-nginx-log
+        # - name: nginx-log
+        #   persistentVolumeClaim:
+        #     claimName: sloopstash-${ENVIRONMENT}-crm-nginx-log
         - name: supervisor-server
           configMap:
             name: nginx
@@ -103,5 +103,8 @@ spec:
           configMap:
             name: nginx
         - name: nginx-server
+          configMap:
+            name: nginx
+        - name: app-nginx
           configMap:
             name: nginx
