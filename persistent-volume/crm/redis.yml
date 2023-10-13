@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: crm-${ENVIRONMENT}-redis-data
+  name: sloopstash-${ENVIRONMENT}-crm-redis-data
 spec:
-  storageClassName: crm-${ENVIRONMENT}-redis-data
+  storageClassName: sloopstash-${ENVIRONMENT}-crm-redis-data
   capacity:
     storage: 2Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce 
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/kubernetes/crm/${ENVIRONMENT}/redis/data
+    path: /mnt/sloopstash/${ENVIRONMENT}/crm/redis/data
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -48,17 +48,17 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: crm-${ENVIRONMENT}-redis-log
+  name: sloopstash-${ENVIRONMENT}-crm-redis-log
 spec:
-  storageClassName: crm-${ENVIRONMENT}-redis-log
+  storageClassName: sloopstash-${ENVIRONMENT}-crm-redis-log
   capacity:
     storage: 1Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce 
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/kubernetes/crm/${ENVIRONMENT}/redis/log
+    path: /mnt/sloopstash/${ENVIRONMENT}/crm/redis/log
   nodeAffinity:
     required:
       nodeSelectorTerms:

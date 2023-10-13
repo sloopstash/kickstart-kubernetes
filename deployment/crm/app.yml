@@ -47,67 +47,66 @@ spec:
                     - local-b
       containers:
         - name: main
-          image: sloopstash/app:v1
+          image: sloopstash/python:v2.7
           imagePullPolicy: Always
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          env:
+            - name: STATIC_ENDPOINT
+              value: http://app-static.crm.${EXTERNAL_DOMAIN}:${CRM_NGINX_PORT}
           volumeMounts:
+            - name: app-source
+              mountPath: /opt/app/source
+            - name: app-log
+              mountPath: /opt/app/log
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
             - name: app-supervisor
               mountPath: /etc/supervisord.d/app.ini
               subPath: app-supervisor
-            - name: nginx-supervisor
-              mountPath: /etc/supervisord.d/nginx.ini
-              subPath: nginx-supervisor
-            - name: nginx-server
-              mountPath: /etc/nginx/nginx.conf
-              subPath: nginx-server
-            - name: app-nginx
-              mountPath: /etc/nginx/conf.d/app.conf
-              subPath: app-nginx
-            - name: app-source
-              mountPath: /opt/app
-          command:
-            - "/usr/bin/supervisord"
-            - "-c"
-            - "/etc/supervisord.conf"
           ports:
-            - containerPort: 80
+            - containerPort: 2000
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /health
+              port: 2000
+              httpHeaders:
+                - name: Host
+                  value: localhost
+            initialDelaySeconds: 15
+            periodSeconds: 20
           readinessProbe:
             exec:
               command:
                 - "/usr/bin/supervisorctl"
                 - "status"
-                - "nginx"
+                - "app"
             initialDelaySeconds: 5
             periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /health
-              port: 80
-              httpHeaders:
-                - name: Host
-                  value: app.crm
-            initialDelaySeconds: 15
-            periodSeconds: 20
       volumes:
+        - name: app-source
+          hostPath:
+            path: ${CRM_APP_SOURCE}
+            type: Directory
+        - name: app-log
+          persistentVolumeClaim:
+            claimName: app-log
         - name: supervisor-server
           configMap:
             name: app
         - name: app-supervisor
           configMap:
             name: app
-        - name: nginx-supervisor
-          configMap:
-            name: app
-        - name: nginx-server
-          configMap:
-            name: app
-        - name: app-nginx
-          configMap:
-            name: app
-        - name: app-source
-          hostPath:
-            path: /opt/kickstart-kubernetes/app
-            type: Directory
+  volumeClaimTemplates:
+    - metadata:
+        name: app-log
+      spec:
+        storageClassName: sloopstash-${ENVIRONMENT}-crm-app-log
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

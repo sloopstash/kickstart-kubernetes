@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  selector:
+    matchLabels:
+      service: nginx
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        service: nginx
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-c
+      containers:
+        - name: main
+          image: sloopstash/nginx:v1.14.0
+          imagePullPolicy: Always
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: app-source
+              mountPath: /opt/app/source
+            - name: nginx-log
+              mountPath: /opt/nginx/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: nginx-supervisor
+              mountPath: /etc/supervisord.d/nginx.ini
+              subPath: nginx-supervisor
+            - name: nginx-server
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx-server
+            - name: app-nginx
+              configMap:
+                name: app
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /
+              port: 80
+              httpHeaders:
+                - name: Host
+                  value: localhost
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            exec:
+              command:
+                - "/usr/bin/supervisorctl"
+                - "status"
+                - "nginx"
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: app-source
+          hostPath:
+            path: ${CRM_APP_SOURCE}
+            type: Directory
+        - name: nginx-log
+          persistentVolumeClaim:
+            claimName: nginx-log
+        - name: supervisor-server
+          configMap:
+            name: nginx
+        - name: nginx-supervisor
+          configMap:
+            name: nginx
+        - name: nginx-server
+          configMap:
+            name: nginx
+  volumeClaimTemplates:
+    - metadata:
+        name: nginx-log
+      spec:
+        storageClassName: sloopstash-${ENVIRONMENT}-crm-nginx-log
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

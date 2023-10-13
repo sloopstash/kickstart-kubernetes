@@ -48,9 +48,15 @@ spec:
                     - local-c
       containers:
         - name: main
-          image: sloopstash/redis:v1
+          image: sloopstash/redis:v4.0.9
           imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
           volumeMounts:
+            - name: redis-data
+              mountPath: /opt/redis/data
+            - name: redis-log
+              mountPath: /opt/redis/log
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
@@ -60,42 +66,38 @@ spec:
             - name: redis-server
               mountPath: /opt/redis/conf/redis.conf
               subPath: redis-server
-            - name: redis-data
-              mountPath: /opt/redis/data
-            - name: redis-log
-              mountPath: /opt/redis/log
-          command:
-            - "/usr/bin/supervisord"
-            - "-c"
-            - "/etc/supervisord.conf"
           ports:
-            - containerPort: 6379
-          readinessProbe:
-            tcpSocket:
-              port: 6379
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            - containerPort: 3000
           livenessProbe:
             exec:
               command:
                 - "/usr/local/bin/redis-cli"
+                - "-p 3000"
                 - "PING"
             initialDelaySeconds: 15
             periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
         - name: log
-          image: sloopstash/redis:v1
+          image: sloopstash/redis:v4.0.9
           imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
           volumeMounts:
-            - name: supervisor-server
-              mountPath: /etc/supervisord.conf
-              subPath: supervisor-server
             - name: redis-log
               mountPath: /opt/redis/log
-          command:
-            - "/usr/bin/supervisord"
-            - "-c"
-            - "/etc/supervisord.conf"
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
       volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-data
+        - name: redis-log
+          persistentVolumeClaim:
+            claimName: redis-log
         - name: supervisor-server
           configMap:
             name: redis
@@ -105,17 +107,11 @@ spec:
         - name: redis-server
           configMap:
             name: redis
-        - name: redis-data
-          persistentVolumeClaim:
-            claimName: redis-data
-        - name: redis-log
-          persistentVolumeClaim:
-            claimName: redis-log
   volumeClaimTemplates:
     - metadata:
         name: redis-data
       spec:
-        storageClassName: crm-${ENVIRONMENT}-redis-data
+        storageClassName: sloopstash-${ENVIRONMENT}-crm-redis-data
         volumeMode: Filesystem
         accessModes:
           - ReadWriteOnce
@@ -125,7 +121,7 @@ spec:
     - metadata:
         name: redis-log
       spec:
-        storageClassName: crm-${ENVIRONMENT}-redis-log
+        storageClassName: sloopstash-${ENVIRONMENT}-crm-redis-log
         volumeMode: Filesystem
         accessModes:
           - ReadWriteOnce
