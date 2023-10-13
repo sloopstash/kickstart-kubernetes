@@ -91,6 +91,7 @@ spec:
               mountPath: /opt/redis/log
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
       volumes:
         - name: redis-data
           persistentVolumeClaim:
