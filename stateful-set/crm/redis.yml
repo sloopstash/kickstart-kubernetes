@@ -30,22 +30,32 @@ spec:
                   operator: In
                   values:
                     - on-premise
+                    - cloud
                 - key: provider
                   operator: In
                   values:
                     - host
+                    - aws
+                    - azure
                 - key: service
                   operator: In
                   values:
                     - virtualbox
+                    - ec2
+                    - eks
+                    - aks
                 - key: region
                   operator: In
                   values:
                     - local
+                    - ap-south-1
+                    - centralindia
                 - key: availability_zone
                   operator: In
                   values:
-                    - local-c
+                    - local-b
+                    - ap-south-1b
+                    - zone-2
       containers:
         - name: main
           image: sloopstash/redis:v4.0.9
