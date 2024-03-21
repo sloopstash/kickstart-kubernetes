@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hadoop-master-data-1
+spec:
+  storageClassName: hadoop-master-data
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce 
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/kubernetes/hadoop/data/master/1
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hadoop-slave-data-1
+spec:
+  storageClassName: hadoop-slave-data
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce 
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/kubernetes/hadoop/data/slave/1
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hadoop-slave-data-2
+spec:
+  storageClassName: hadoop-slave-data
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce 
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/kubernetes/hadoop/data/slave/2
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hadoop-slave-data-3
+spec:
+  storageClassName: hadoop-slave-data
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce 
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/kubernetes/hadoop/data/slave/3
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux

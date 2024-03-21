@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hadoop-slave-node
+spec:
+  selector:
+    matchLabels:
+      service: hadoop-slave
+  replicas: 3
+  serviceName: hadoop-slave
+  template:
+    metadata:
+      labels:
+        service: hadoop-slave
+    spec:
+      containers:
+        - name: main
+          image: sloopstash/hadoop:v1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: JAVA_HOME
+              value: /usr/java/jdk1.8.0_131/jre
+            - name: HADOOP_HOME
+              value: /usr/local/lib/hadoop
+            - name: HADOOP_CONF_DIR
+              value: /usr/local/lib/hadoop/etc/hadoop
+            - name: PATH
+              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/java/jdk1.8.0_131/jre/bin:/usr/local/lib/hadoop/bin
+          volumeMounts:
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+            - name: hadoop-env
+              mountPath: /usr/local/lib/hadoop/etc/hadoop/hadoop-env.sh
+            - name: hadoop-core-site
+              mountPath: /usr/local/lib/hadoop/etc/hadoop/core-site.xml
+            - name: hadoop-hdfs-site
+              mountPath: /usr/local/lib/hadoop/etc/hadoop/hdfs-site.xml
+            - name: hadoop-data
+              mountPath: /opt/hadoop/data
+            - name: hadoop-script
+              mountPath: /opt/hadoop/script
+          command:
+            - "/usr/bin/supervisord"
+            - "-c"
+            - "/etc/supervisord.conf"
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - "/bin/su"
+                  - "hadoop"
+                  - "/opt/hadoop/script/start.sh"
+            preStop:
+              exec:
+                command:
+                  - "/bin/su"
+                  - "hadoop"
+                  - "/opt/hadoop/script/stop.sh"
+      volumes:
+        - name: supervisor-server
+          hostPath:
+            path: /opt/kickstart-hadoop/supervisor/conf/main.conf
+            type: File
+        - name: hadoop-env
+          hostPath:
+            path: /opt/kickstart-hadoop/conf/hadoop-env.sh
+            type: File
+        - name: hadoop-core-site
+          hostPath:
+            path: /opt/kickstart-hadoop/conf/slave/core-site.xml
+            type: File
+        - name: hadoop-hdfs-site
+          hostPath:
+            path: /opt/kickstart-hadoop/conf/slave/hdfs-site.xml
+            type: File
+        - name: hadoop-data
+          persistentVolumeClaim:
+            claimName: hadoop-data
+        - name: hadoop-script
+          hostPath:
+            path: /opt/kickstart-hadoop/script/slave
+            type: Directory
+  volumeClaimTemplates:
+    - metadata:
+        name: hadoop-data
+      spec:
+        storageClassName: hadoop-slave-data
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
