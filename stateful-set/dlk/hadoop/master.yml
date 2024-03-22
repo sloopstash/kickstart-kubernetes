@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: main
-          image: sloopstash/hadoop:v1
+          image: sloopstash/hadoop:v2.10.1
           imagePullPolicy: IfNotPresent
           env:
             - name: JAVA_HOME
