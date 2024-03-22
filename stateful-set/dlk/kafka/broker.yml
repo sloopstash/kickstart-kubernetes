@@ -48,7 +48,7 @@ spec:
                     - us-west-2a
       containers:
         - name: main
-          image: sloopstash/kafka:v1
+          image: sloopstash/kafka:v3.2.1
           imagePullPolicy: IfNotPresent
           env:
             - name: CLUSTER_ID
