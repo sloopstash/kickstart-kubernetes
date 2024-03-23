@@ -27,23 +27,33 @@ spec:
           - key: type
             operator: In
             values:
+              - on-premise
               - cloud
           - key: provider
             operator: In
             values:
+              - host
               - aws
+              - azure
           - key: service
             operator: In
             values:
+              - virtualbox
               - ec2
+              - eks
+              - aks
           - key: region
             operator: In
             values:
-              - us-west-2
+              - local
+              - ap-south-1
+              - centralindia
           - key: availability_zone
             operator: In
             values:
-              - us-west-2a
+              - local-b
+              - ap-south-1b
+              - zone-1
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -74,23 +84,33 @@ spec:
           - key: type
             operator: In
             values:
+              - on-premise
               - cloud
           - key: provider
             operator: In
             values:
+              - host
               - aws
+              - azure
           - key: service
             operator: In
             values:
+              - virtualbox
               - ec2
+              - eks
+              - aks
           - key: region
             operator: In
             values:
-              - us-west-2
+              - local
+              - ap-south-1
+              - centralindia
           - key: availability_zone
             operator: In
             values:
-              - us-west-2a
+              - local-b
+              - ap-south-1b
+              - zone-1
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -121,23 +141,33 @@ spec:
           - key: type
             operator: In
             values:
+              - on-premise
               - cloud
           - key: provider
             operator: In
             values:
+              - host
               - aws
+              - azure
           - key: service
             operator: In
             values:
+              - virtualbox
               - ec2
+              - eks
+              - aks
           - key: region
             operator: In
             values:
-              - us-west-2
+              - local
+              - ap-south-1
+              - centralindia
           - key: availability_zone
             operator: In
             values:
-              - us-west-2a
+              - local-b
+              - ap-south-1b
+              - zone-1
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -168,23 +198,33 @@ spec:
           - key: type
             operator: In
             values:
+              - on-premise
               - cloud
           - key: provider
             operator: In
             values:
+              - host
               - aws
+              - azure
           - key: service
             operator: In
             values:
+              - virtualbox
               - ec2
+              - eks
+              - aks
           - key: region
             operator: In
             values:
-              - us-west-2
+              - local
+              - ap-south-1
+              - centralindia
           - key: availability_zone
             operator: In
             values:
-              - us-west-2a
+              - local-b
+              - ap-south-1b
+              - zone-2
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -215,23 +255,33 @@ spec:
           - key: type
             operator: In
             values:
+              - on-premise
               - cloud
           - key: provider
             operator: In
             values:
+              - host
               - aws
+              - azure
           - key: service
             operator: In
             values:
+              - virtualbox
               - ec2
+              - eks
+              - aks
           - key: region
             operator: In
             values:
-              - us-west-2
+              - local
+              - ap-south-1
+              - centralindia
           - key: availability_zone
             operator: In
             values:
-              - us-west-2a
+              - local-b
+              - ap-south-1b
+              - zone-2
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -262,20 +312,30 @@ spec:
           - key: type
             operator: In
             values:
+              - on-premise
               - cloud
           - key: provider
             operator: In
             values:
+              - host
               - aws
+              - azure
           - key: service
             operator: In
             values:
+              - virtualbox
               - ec2
+              - eks
+              - aks
           - key: region
             operator: In
             values:
-              - us-west-2
+              - local
+              - ap-south-1
+              - centralindia
           - key: availability_zone
             operator: In
             values:
-              - us-west-2a
+              - local-b
+              - ap-south-1b
+              - zone-2
