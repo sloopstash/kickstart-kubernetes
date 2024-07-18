@@ -16,10 +16,10 @@ Vagrant.configure("2") do |config|
   config.vm.box_version = "1.1.1"
 
   # Define virtual machine name.
-  # config.vm.define "sloopstash-centos-7-server"
+  # config.vm.define "sloopstash-alma-linux-9-server"
 
   # Set virtual machine hostname.
-  # config.vm.hostname = "sloopstash-centos-7-server"
+  # config.vm.hostname = "sloopstash-alma-linux-9-server"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.101.4"
+  # config.vm.network "private_network", ip: "192.168.101.8"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -63,7 +63,7 @@ Vagrant.configure("2") do |config|
   #
   config.vm.provider "virtualbox" do |vb|
     # Enable USB controller for the virtual machine.
-    vb.customize ["modifyvm",:id,"--usb","on"]
+    # vb.customize ["modifyvm",:id,"--usb","on"]
 
     # Disable GUI when booting the virtual machine.
     vb.gui = false
@@ -72,10 +72,10 @@ Vagrant.configure("2") do |config|
     vb.memory = "2048"
 
     # Allocate processors to the virtual machine.
-    vb.cpus = "2"
+    vb.cpus = "1"
 
     # Set name for the virtual machine.
-    # vb.name = "sloopstash-centos-7-server"
+    # vb.name = "sloopstash-alma-linux-9-server"
   end
   #
   # View the documentation for the provider you are using for more
@@ -88,7 +88,7 @@ Vagrant.configure("2") do |config|
     # Update installed packages.
     dnf update -y
     # Install system packages.
-    dnf install -y wget vim nano net-tools gcc make tar git unzip sysstat tree initscripts bind-utils nc nmap logrotate crontabs
+    dnf install -y wget vim net-tools gcc make tar git unzip sysstat tree initscripts bind-utils nc nmap logrotate crontabs
     dnf install -y python-devel python-pip python-setuptools
     # Install Supervisor.
     python -m pip install supervisor
@@ -99,61 +99,23 @@ Vagrant.configure("2") do |config|
   # Define multiple virtual machines.
   config.vm.define "sloopstash-k8s-mtr-1" do |sloopstash_k8s_mtr_1|
     sloopstash_k8s_mtr_1.vm.hostname = "sloopstash-k8s-mtr-1"
-    sloopstash_k8s_mtr_1.vm.network "private_network", ip: "192.168.101.81"
+    sloopstash_k8s_mtr_1.vm.network "private_network", ip: "192.168.101.61"
     sloopstash_k8s_mtr_1.vm.provider "virtualbox" do |vb|
       vb.name = "sloopstash-k8s-mtr-1"
     end
   end
   config.vm.define "sloopstash-k8s-wkr-1" do |sloopstash_k8s_wkr_1|
     sloopstash_k8s_wkr_1.vm.hostname = "sloopstash-k8s-wkr-1"
-    sloopstash_k8s_wkr_1.vm.network "private_network", ip: "192.168.101.84"
+    sloopstash_k8s_wkr_1.vm.network "private_network", ip: "192.168.101.64"
     sloopstash_k8s_wkr_1.vm.provider "virtualbox" do |vb|
       vb.name = "sloopstash-k8s-wkr-1"
     end
-    sloopstash_k8s_wkr_1.vm.provision "shell", inline: <<-SHELL
-      mkdir -p /mnt/sloopstash/qaa/crm/redis/data
-      mkdir -p /mnt/sloopstash/qaa/crm/redis/log
-      mkdir -p /mnt/sloopstash/qaa/crm/app/log
-      mkdir -p /mnt/sloopstash/qaa/crm/nginx/log
-      mkdir -p /mnt/sloopstash/qab/crm/redis/data
-      mkdir -p /mnt/sloopstash/qab/crm/redis/log
-      mkdir -p /mnt/sloopstash/qab/crm/app/log
-      mkdir -p /mnt/sloopstash/qab/crm/nginx/log
-      mkdir -p /mnt/sloopstash/stg/crm/redis/data
-      mkdir -p /mnt/sloopstash/stg/crm/redis/log
-      mkdir -p /mnt/sloopstash/stg/crm/app/log
-      mkdir -p /mnt/sloopstash/stg/crm/nginx/log
-      mkdir -p /mnt/sloopstash/prd/crm/redis/data
-      mkdir -p /mnt/sloopstash/prd/crm/redis/log
-      mkdir -p /mnt/sloopstash/prd/crm/app/log
-      mkdir -p /mnt/sloopstash/prd/crm/nginx/log
-      chmod -R ugo+rwx /mnt/sloopstash
-    SHELL
   end
   config.vm.define "sloopstash-k8s-wkr-2" do |sloopstash_k8s_wkr_2|
     sloopstash_k8s_wkr_2.vm.hostname = "sloopstash-k8s-wkr-2"
-    sloopstash_k8s_wkr_2.vm.network "private_network", ip: "192.168.101.85"
+    sloopstash_k8s_wkr_2.vm.network "private_network", ip: "192.168.101.65"
     sloopstash_k8s_wkr_2.vm.provider "virtualbox" do |vb|
       vb.name = "sloopstash-k8s-wkr-2"
     end
-    sloopstash_k8s_wkr_2.vm.provision "shell", inline: <<-SHELL
-      mkdir -p /mnt/sloopstash/qaa/crm/redis/data
-      mkdir -p /mnt/sloopstash/qaa/crm/redis/log
-      mkdir -p /mnt/sloopstash/qaa/crm/app/log
-      mkdir -p /mnt/sloopstash/qaa/crm/nginx/log
-      mkdir -p /mnt/sloopstash/qab/crm/redis/data
-      mkdir -p /mnt/sloopstash/qab/crm/redis/log
-      mkdir -p /mnt/sloopstash/qab/crm/app/log
-      mkdir -p /mnt/sloopstash/qab/crm/nginx/log
-      mkdir -p /mnt/sloopstash/stg/crm/redis/data
-      mkdir -p /mnt/sloopstash/stg/crm/redis/log
-      mkdir -p /mnt/sloopstash/stg/crm/app/log
-      mkdir -p /mnt/sloopstash/stg/crm/nginx/log
-      mkdir -p /mnt/sloopstash/prd/crm/redis/data
-      mkdir -p /mnt/sloopstash/prd/crm/redis/log
-      mkdir -p /mnt/sloopstash/prd/crm/app/log
-      mkdir -p /mnt/sloopstash/prd/crm/nginx/log
-      chmod -R ugo+rwx /mnt/sloopstash
-    SHELL
   end
 end
