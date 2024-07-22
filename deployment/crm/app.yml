@@ -52,7 +52,7 @@ spec:
                 - key: availability_zone
                   operator: In
                   values:
-                    - local-a
+                    - local-c
                     - ap-south-1a
                     - zone-1
       containers:
@@ -73,7 +73,7 @@ spec:
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
             - name: app-supervisor
-              mountPath: /etc/supervisord.d/app.ini
+              mountPath: /opt/app/system/supervisor.ini
               subPath: app-supervisor
           ports:
             - containerPort: 2000

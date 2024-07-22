@@ -71,10 +71,10 @@ spec:
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
             - name: redis-supervisor
-              mountPath: /etc/supervisord.d/redis.ini
+              mountPath: /opt/redis/system/supervisor.ini
               subPath: redis-supervisor
             - name: redis-server
-              mountPath: /opt/redis/conf/redis.conf
+              mountPath: /opt/redis/conf/server.conf
               subPath: redis-server
           ports:
             - containerPort: 3000

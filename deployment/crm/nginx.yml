@@ -70,13 +70,13 @@ spec:
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
             - name: nginx-supervisor
-              mountPath: /etc/supervisord.d/nginx.ini
+              mountPath: /opt/nginx/system/supervisor.ini
               subPath: nginx-supervisor
             - name: nginx-server
-              mountPath: /etc/nginx/nginx.conf
+              mountPath: /opt/nginx/conf/server.conf
               subPath: nginx-server
             - name: app-nginx
-              mountPath: /etc/nginx/conf.d/app.conf
+              mountPath: /opt/nginx/conf/app.conf
               subPath: app-nginx
           ports:
             - containerPort: 80
