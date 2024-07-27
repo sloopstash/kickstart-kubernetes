@@ -54,3 +54,17 @@ spec:
               - local-b
               - ap-south-1b
               - zone-2
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-log
+  namespace: sloopstash-${ENVIRONMENT}-crm
+spec:
+  storageClassName: sloopstash-${ENVIRONMENT}-crm-nginx-log
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
