@@ -51,6 +51,6 @@ spec:
           - key: availability_zone
             operator: In
             values:
-              - local-a
+              - local-c
               - ap-south-1a
               - zone-1

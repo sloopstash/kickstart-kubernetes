@@ -52,7 +52,7 @@ spec:
                 - key: availability_zone
                   operator: In
                   values:
-                    - local-a
+                    - local-c
                     - ap-south-1a
                     - zone-1
       containers:
@@ -67,13 +67,13 @@ spec:
           volumeMounts:
             - name: app-source
               mountPath: /opt/app/source
-            # - name: app-log
-            #   mountPath: /opt/app/log
+            - name: app-log
+              mountPath: /opt/app/log
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
             - name: app-supervisor
-              mountPath: /etc/supervisord.d/app.ini
+              mountPath: /opt/app/system/supervisor.ini
               subPath: app-supervisor
           ports:
             - containerPort: 2000
@@ -95,14 +95,25 @@ spec:
                 - "app"
             initialDelaySeconds: 5
             periodSeconds: 10
+        - name: log
+          image: sloopstash/python:v2.7
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: app-log
+              mountPath: /opt/app/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
       volumes:
         - name: app-source
           hostPath:
             path: ${CRM_APP_SOURCE}
             type: Directory
-        # - name: app-log
-        #   persistentVolumeClaim:
-        #     claimName: sloopstash-${ENVIRONMENT}-crm-app-log
+        - name: app-log
+          persistentVolumeClaim:
+            claimName: app-log
         - name: supervisor-server
           configMap:
             name: app

@@ -64,20 +64,20 @@ spec:
           volumeMounts:
             - name: app-source
               mountPath: /opt/app/source
-            # - name: nginx-log
-            #   mountPath: /opt/nginx/log
+            - name: nginx-log
+              mountPath: /opt/nginx/log
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
             - name: nginx-supervisor
-              mountPath: /etc/supervisord.d/nginx.ini
+              mountPath: /opt/nginx/system/supervisor.ini
               subPath: nginx-supervisor
             - name: nginx-server
-              mountPath: /etc/nginx/nginx.conf
+              mountPath: /opt/nginx/conf/server.conf
               subPath: nginx-server
-            - name: app-nginx
-              mountPath: /etc/nginx/conf.d/app.conf
-              subPath: app-nginx
+            - name: nginx-app
+              mountPath: /opt/nginx/conf/app.conf
+              subPath: nginx-app
           ports:
             - containerPort: 80
           livenessProbe:
@@ -98,14 +98,25 @@ spec:
                 - "nginx"
             initialDelaySeconds: 5
             periodSeconds: 10
+        - name: log
+          image: sloopstash/nginx:v1.14.0
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: nginx-log
+              mountPath: /opt/nginx/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
       volumes:
         - name: app-source
           hostPath:
             path: ${CRM_APP_SOURCE}
             type: Directory
-        # - name: nginx-log
-        #   persistentVolumeClaim:
-        #     claimName: sloopstash-${ENVIRONMENT}-crm-nginx-log
+        - name: nginx-log
+          persistentVolumeClaim:
+            claimName: nginx-log
         - name: supervisor-server
           configMap:
             name: nginx
@@ -115,6 +126,6 @@ spec:
         - name: nginx-server
           configMap:
             name: nginx
-        - name: app-nginx
+        - name: nginx-app
           configMap:
             name: nginx
