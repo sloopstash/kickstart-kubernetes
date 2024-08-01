@@ -95,7 +95,7 @@ spec:
                 - "app"
             initialDelaySeconds: 5
             periodSeconds: 10
-        - name: app-log
+        - name: log
           image: sloopstash/python:v2.7
           imagePullPolicy: IfNotPresent
           command: ["/usr/bin/supervisord"]

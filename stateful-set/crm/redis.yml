@@ -59,7 +59,7 @@ spec:
       containers:
         - name: main
           image: sloopstash/redis:v4.0.9
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command: ["/usr/bin/supervisord"]
           args: ["-c", "/etc/supervisord.conf"]
           volumeMounts:

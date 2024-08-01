@@ -98,7 +98,7 @@ spec:
                 - "nginx"
             initialDelaySeconds: 5
             periodSeconds: 10
-        - name: nginx-log
+        - name: log
           image: sloopstash/nginx:v1.14.0
           imagePullPolicy: IfNotPresent
           command: ["/usr/bin/supervisord"]
@@ -116,7 +116,7 @@ spec:
             type: Directory
         - name: nginx-log
           persistentVolumeClaim:
-           claimName: nginx-log
+            claimName: nginx-log
         - name: supervisor-server
           configMap:
             name: nginx
