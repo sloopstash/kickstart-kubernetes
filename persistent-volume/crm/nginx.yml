@@ -3,15 +3,18 @@ kind: PersistentVolume
 metadata:
   name: sloopstash-${ENVIRONMENT}-crm-nginx-log
 spec:
-  storageClassName: sloopstash-${ENVIRONMENT}-crm-nginx-log
+  storageClassName: standard
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
     path: /mnt/sloopstash/${ENVIRONMENT}/crm/nginx/log
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-crm
+    name: nginx-log
   nodeAffinity:
     required:
       nodeSelectorTerms:

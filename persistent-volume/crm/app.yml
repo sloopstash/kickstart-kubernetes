@@ -3,15 +3,18 @@ kind: PersistentVolume
 metadata:
   name: sloopstash-${ENVIRONMENT}-crm-app-log
 spec:
-  storageClassName: sloopstash-${ENVIRONMENT}-crm-app-log
+  storageClassName: standard
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
     path: /mnt/sloopstash/${ENVIRONMENT}/crm/app/log
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-crm
+    name: app-log
   nodeAffinity:
     required:
       nodeSelectorTerms:

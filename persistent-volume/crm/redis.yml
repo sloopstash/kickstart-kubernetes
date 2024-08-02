@@ -3,9 +3,9 @@ kind: PersistentVolume
 metadata:
   name: sloopstash-${ENVIRONMENT}-crm-redis-data
 spec:
-  storageClassName: sloopstash-${ENVIRONMENT}-crm-redis-data
+  storageClassName: standard
   capacity:
-    storage: 2Gi
+    storage: 5Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
@@ -60,9 +60,9 @@ kind: PersistentVolume
 metadata:
   name: sloopstash-${ENVIRONMENT}-crm-redis-log
 spec:
-  storageClassName: sloopstash-${ENVIRONMENT}-crm-redis-log
+  storageClassName: standard
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce

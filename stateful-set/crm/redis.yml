@@ -123,20 +123,20 @@ spec:
     - metadata:
         name: redis-data
       spec:
-        storageClassName: sloopstash-${ENVIRONMENT}-crm-redis-data
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: redis-log
+      spec:
+        storageClassName: standard
         volumeMode: Filesystem
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
             storage: 2Gi
-    - metadata:
-        name: redis-log
-      spec:
-        storageClassName: sloopstash-${ENVIRONMENT}-crm-redis-log
-        volumeMode: Filesystem
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 1Gi

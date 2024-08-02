@@ -3,7 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: app-log
 spec:
-  storageClassName: sloopstash-${ENVIRONMENT}-crm-app-log
+  storageClassName: standard
+  volumeName: sloopstash-${ENVIRONMENT}-crm-app-log
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
