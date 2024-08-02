@@ -4,6 +4,7 @@ metadata:
   name: app-log
 spec:
   storageClassName: sloopstash-${ENVIRONMENT}-crm-app-log
+  volumeName: sloopstash-${ENVIRONMENT}-crm-app-log
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce

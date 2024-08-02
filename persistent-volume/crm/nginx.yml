@@ -10,6 +10,9 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-crm
+    name: nginx-log
   local:
     path: /mnt/sloopstash/${ENVIRONMENT}/crm/nginx/log
   nodeAffinity:
