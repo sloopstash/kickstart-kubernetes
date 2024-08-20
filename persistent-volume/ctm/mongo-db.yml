@@ -1,0 +1,115 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-${ENVIRONMENT}-ctm-mongo-db-data
+spec:
+  storageClassName: standard
+  capacity:
+   storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/${ENVIRONMENT}/ctm/mongo-db/data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+              - cloud
+          - key: provider
+            operator: In
+            values:
+              - host
+              - aws
+              - azure
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+              - ec2
+              - eks
+              - aks
+          - key: region
+            operator: In
+            values:
+              - local
+              - ap-south-1
+              - centralindia
+          - key: availability_zone
+            operator: In
+            values:
+              - local-b
+              - local-c
+              - ap-south-1b
+              - zone-2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-${ENVIRONMENT}-ctm-mongo-db-log
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/${ENVIRONMENT}/ctm/mongo-db/log
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+              - cloud
+          - key: provider
+            operator: In
+            values:
+              - host
+              - aws
+              - azure
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+              - ec2
+              - eks
+              - aks
+          - key: region
+            operator: In
+            values:
+              - local
+              - ap-south-1
+              - centralindia
+          - key: availability_zone
+            operator: In
+            values:
+              - local-b
+              - local-c
+              - ap-south-1b
+              - zone-2

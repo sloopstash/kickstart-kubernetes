@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-log
+spec:
+  storageClassName: standard
+  volumeName: sloopstash-${ENVIRONMENT}-ctm-app-log
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
