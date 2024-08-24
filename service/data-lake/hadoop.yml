@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hadoop-name
+  labels:
+    service: hadoop-name
+spec:
+  ports:
+    - name: metadata
+      port: 9000
+      targetPort: 9000
+      protocol: TCP
+    - name: web
+      port: 50070
+      targetPort: 50070
+      protocol: TCP
+  selector:
+    service: hadoop-name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hadoop-data
+  labels:
+    service: hadoop-data
+spec:
+  ports:
+    - name: web
+      port: 50075
+      targetPort: 50075
+      protocol: TCP
+  selector:
+    service: hadoop-data

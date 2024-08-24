@@ -1,0 +1,162 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hadoop-data
+spec:
+  selector:
+    matchLabels:
+      service: hadoop-data
+  replicas: 3
+  serviceName: hadoop-data
+  template:
+    metadata:
+      labels:
+        service: hadoop-data
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                    - cloud
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                    - aws
+                    - azure
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                    - ec2
+                    - eks
+                    - aks
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                    - ap-south-1
+                    - centralindia
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-c
+                    - ap-south-1b
+                    - zone-2
+      containers:
+        - name: main
+          image: sloopstash/hadoop:v2.10.1
+          imagePullPolicy: Always
+          env:
+            - name: JAVA_HOME
+              value: /usr/java/jdk1.8.0_131/jre
+            - name: HADOOP_HOME
+              value: /usr/local/lib/hadoop
+            - name: HADOOP_CONF_DIR
+              value: /usr/local/lib/hadoop/etc/hadoop
+            - name: PATH
+              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/java/jdk1.8.0_131/jre/bin:/usr/local/lib/hadoop/bin
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: hadoop-environment
+                  key: environment
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: hadoop-data-data
+              mountPath: /opt/hadoop/data
+            - name: hadoop-data-log
+              mountPath: /opt/hadoop/log
+            - name: hadoop-data-tmp
+              mountPath: /opt/hadoop/tmp
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: hadoop-data-supervisor
+              mountPath: /opt/hadoop/system/supervisor.ini
+              subPath: hadoop-data-supervisor
+            - name: hadoop-data-env
+              mountPath: /opt/hadoop/conf/env.sh
+              subPath: hadoop-data-env
+            - name: hadoop-data-core-site
+              mountPath: /opt/hadoop/conf/core-site.xml
+              subPath: hadoop-data-core-site
+            - name: hadoop-data-hdfs-site
+              mountPath: /opt/hadoop/conf/hdfs-site.xml
+              subPath: hadoop-data-hdfs-site
+            - name: hadoop-data-script
+              mountPath: /opt/hadoop/script
+      volumes:
+        - name: hadoop-data-data
+          persistentVolumeClaim:
+            claimName: hadoop-data-data
+        - name: hadoop-data-log
+          persistentVolumeClaim:
+            claimName: hadoop-data-log
+        - name: hadoop-data-tmp
+          persistentVolumeClaim:
+            claimName: hadoop-data-tmp
+        - name: supervisor-server
+          configMap:
+            name: hadoop-data
+        - name: hadoop-data-supervisor
+          configMap:
+            name: hadoop-data
+        - name: hadoop-data-env
+          configMap:
+            name: hadoop-data
+        - name: hadoop-data-core-site
+          configMap:
+            name: hadoop-data
+        - name: hadoop-data-hdfs-site
+          configMap:
+            name: hadoop-data
+        - name: hadoop-data-script
+          hostPath:
+            path: ${HOME_DIR}/workload/hadoop/2.10.1/data/script
+            type: Directory
+  volumeClaimTemplates:
+    - metadata:
+        name: hadoop-data-data
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+    - metadata:
+        name: hadoop-data-log
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+    - metadata:
+        name: hadoop-data-tmp
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
