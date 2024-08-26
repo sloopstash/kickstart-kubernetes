@@ -1,0 +1,150 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-db
+spec:
+  selector:
+    matchLabels:
+      service: mongo-db
+  replicas: 1
+  serviceName: mongo-db
+  template:
+    metadata:
+      labels:
+        service: mongo-db
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux
+                  - key: node-role.kubernetes.io/worker
+                    operator: In
+                    values:
+                      - worker
+                  - key: type
+                    operator: In
+                    values:
+                      - on-premise
+                      - cloud
+                  - key: provider
+                    operator: In
+                    values:
+                      - host
+                      - aws
+                      - azure
+                  - key: service
+                    operator: In
+                    values:
+                      - virtualbox
+                      - ec2
+                      - eks
+                      - aks
+                  - key: region
+                    operator: In
+                    values:
+                      - local
+                      - ap-south-1
+                      - centralindia
+                  - key: availability_zone
+                    operator: In
+                    values:
+                      - local-b
+                      - local-c
+                      - ap-south-1b
+                      - zone-2
+      containers:
+        - name: main
+          image: 'sloopstash/mongo-db:v4.4.4'
+          imagePullPolicy: IfNotPresent
+          command:
+            - /usr/bin/supervisord
+          args:
+            - '-c'
+            - /etc/supervisord.conf
+          volumeMounts:
+            - name: mongo-db-data
+              mountPath: /opt/mongo-db/data
+            - name: mongo-db-log
+              mountPath: /opt/mongo-db/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: mongo-db-supervisor
+              mountPath: /opt/mongo-db/system/supervisor.ini
+              subPath: mongo-db-supervisor
+            - name: mongo-db-server
+              mountPath: /opt/mongo-db/conf/server.conf
+              subPath: mongo-db-server
+          ports:
+            - containerPort: 7000
+          livenessProbe:
+            exec:
+              command:
+                - mongo
+                - '--port'
+                - '7000'
+                - '--eval'
+                - db.adminCommand('ping')
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 7000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+        - name: log
+          image: 'sloopstash/mongo-db:v4.4.4'
+          imagePullPolicy: IfNotPresent
+          command:
+            - /usr/bin/supervisord
+          args:
+            - '-c'
+            - /etc/supervisord.conf
+          volumeMounts:
+            - name: mongo-db-log
+              mountPath: /opt/mongo-db/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+      volumes:
+        - name: mongo-db-data
+          persistentVolumeClaim:
+            claimName: mongo-db-data
+        - name: mongo-db-log
+          persistentVolumeClaim:
+            claimName: mongo-db-log
+        - name: supervisor-server
+          configMap:
+            name: mongo-db
+        - name: mongo-db-supervisor
+          configMap:
+            name: mongo-db
+        - name: mongo-db-server
+          configMap:
+            name: mongo-db
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-db-data
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
+    - metadata:
+        name: mongo-db-log
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
