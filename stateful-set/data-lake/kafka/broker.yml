@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka-broker
+spec:
+  selector:
+    matchLabels:
+      service: kafka-broker
+  replicas: 3
+  serviceName: kafka-broker
+  template:
+    metadata:
+      labels:
+        service: kafka-broker
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                    - cloud
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                    - aws
+                    - azure
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                    - ec2
+                    - eks
+                    - aks
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                    - ap-south-1
+                    - centralindia
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-c
+                    - ap-south-1b
+                    - zone-2
+      containers:
+        - name: main
+          image: sloopstash/kafka:v3.2.1
+          imagePullPolicy: Always
+          env:
+            - name: KAFKA_OPTS
+              value: "-Djava.net.preferIPv4Stack=True"
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-environment
+                  key: environment
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: kafka-broker-data
+              mountPath: /opt/kafka/data
+            - name: kafka-broker-log
+              mountPath: /opt/kafka/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: kafka-broker-supervisor
+              mountPath: /opt/kafka/system/supervisor.ini
+              subPath: kafka-broker-supervisor
+            - name: kafka-broker-server
+              mountPath: /opt/kafka/conf/server-reference.conf
+              subPath: kafka-broker-server
+            - name: kafka-broker-script
+              mountPath: /opt/kafka/script
+          ports:
+            - containerPort: 9092
+          livenessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      volumes:
+        - name: kafka-broker-data
+          persistentVolumeClaim:
+            claimName: kafka-broker-data
+        - name: kafka-broker-log
+          persistentVolumeClaim:
+            claimName: kafka-broker-log
+        - name: supervisor-server
+          configMap:
+            name: kafka-broker
+        - name: kafka-broker-supervisor
+          configMap:
+            name: kafka-broker
+        - name: kafka-broker-server
+          configMap:
+            name: kafka-broker
+        - name: kafka-broker-script
+          hostPath:
+            path: ${HOME_DIR}/workload/kafka/3.2.1/broker/script
+            type: Directory
+  volumeClaimTemplates:
+    - metadata:
+        name: kafka-broker-data
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+    - metadata:
+        name: kafka-broker-log
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

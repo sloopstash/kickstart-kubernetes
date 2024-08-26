@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka-controller
+spec:
+  selector:
+    matchLabels:
+      service: kafka-controller
+  replicas: 3
+  serviceName: kafka-controller
+  template:
+    metadata:
+      labels:
+        service: kafka-controller
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                    - cloud
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                    - aws
+                    - azure
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                    - ec2
+                    - eks
+                    - aks
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                    - ap-south-1
+                    - centralindia
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-b
+                    - ap-south-1b
+                    - zone-2
+      containers:
+        - name: main
+          image: sloopstash/kafka:v3.2.1
+          imagePullPolicy: Always
+          env:
+            - name: KAFKA_OPTS
+              value: "-Djava.net.preferIPv4Stack=True"
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-environment
+                  key: environment
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: kafka-controller-data
+              mountPath: /opt/kafka/data
+            - name: kafka-controller-log
+              mountPath: /opt/kafka/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: kafka-controller-supervisor
+              mountPath: /opt/kafka/system/supervisor.ini
+              subPath: kafka-controller-supervisor
+            - name: kafka-controller-server
+              mountPath: /opt/kafka/conf/server-reference.conf
+              subPath: kafka-controller-server
+            - name: kafka-controller-script
+              mountPath: /opt/kafka/script
+          ports:
+            - containerPort: 9093
+          livenessProbe:
+            tcpSocket:
+              port: 9093
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 9093
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      volumes:
+        - name: kafka-controller-data
+          persistentVolumeClaim:
+            claimName: kafka-controller-data
+        - name: kafka-controller-log
+          persistentVolumeClaim:
+            claimName: kafka-controller-log
+        - name: supervisor-server
+          configMap:
+            name: kafka-controller
+        - name: kafka-controller-supervisor
+          configMap:
+            name: kafka-controller
+        - name: kafka-controller-server
+          configMap:
+            name: kafka-controller
+        - name: kafka-controller-script
+          hostPath:
+            path: ${HOME_DIR}/workload/kafka/3.2.1/controller/script
+            type: Directory
+  volumeClaimTemplates:
+    - metadata:
+        name: kafka-controller-data
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+    - metadata:
+        name: kafka-controller-log
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
