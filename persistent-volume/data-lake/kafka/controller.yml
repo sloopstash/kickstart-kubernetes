@@ -1,20 +1,20 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-data-0
+  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-0-data
 spec:
   storageClassName: standard
   capacity:
     storage: 5Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce 
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/data/controller/0
+    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/controller/0/data
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-controller-data-kafka-controller-0
+    name: kafka-controller-data-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -61,20 +61,20 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-data-1
+  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-0-log
 spec:
   storageClassName: standard
   capacity:
-    storage: 5Gi
+    storage: 2Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce 
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/data/controller/1
+    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/controller/0/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-controller-data-kafka-controller-1
+    name: kafka-controller-log-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -121,20 +121,20 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-data-2
+  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-1-data
 spec:
   storageClassName: standard
   capacity:
     storage: 5Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce 
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/data/controller/2
+    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/controller/1/data
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-controller-data-kafka-controller-2
+    name: kafka-controller-data-1
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -181,7 +181,127 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-log-0
+  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-1-log
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/controller/1/log
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
+    name: kafka-controller-log-1
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+              - cloud
+          - key: provider
+            operator: In
+            values:
+              - host
+              - aws
+              - azure
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+              - ec2
+              - eks
+              - aks
+          - key: region
+            operator: In
+            values:
+              - local
+              - ap-south-1
+              - centralindia
+          - key: availability_zone
+            operator: In
+            values:
+              - local-b
+              - ap-south-1b
+              - zone-2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-2-data
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/controller/2/data
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
+    name: kafka-controller-data-2
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+              - cloud
+          - key: provider
+            operator: In
+            values:
+              - host
+              - aws
+              - azure
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+              - ec2
+              - eks
+              - aks
+          - key: region
+            operator: In
+            values:
+              - local
+              - ap-south-1
+              - centralindia
+          - key: availability_zone
+            operator: In
+            values:
+              - local-b
+              - ap-south-1b
+              - zone-2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-2-log
 spec:
   storageClassName: standard
   capacity:
@@ -191,130 +311,10 @@ spec:
     - ReadWriteOnce 
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/log/controller/0
+    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/controller/2/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-controller-log-kafka-controller-0 
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-          - key: kubernetes.io/os
-            operator: In
-            values:
-              - linux
-          - key: node-role.kubernetes.io/worker
-            operator: In
-            values:
-              - worker
-          - key: type
-            operator: In
-            values:
-              - on-premise
-              - cloud
-          - key: provider
-            operator: In
-            values:
-              - host
-              - aws
-              - azure
-          - key: service
-            operator: In
-            values:
-              - virtualbox
-              - ec2
-              - eks
-              - aks
-          - key: region
-            operator: In
-            values:
-              - local
-              - ap-south-1
-              - centralindia
-          - key: availability_zone
-            operator: In
-            values:
-              - local-b
-              - ap-south-1b
-              - zone-2
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-log-1
-spec:
-  storageClassName: standard
-  capacity:
-    storage: 2Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce 
-  persistentVolumeReclaimPolicy: Retain
-  local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/log/controller/1
-  claimRef:
-    namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-controller-log-kafka-controller-1
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-          - key: kubernetes.io/os
-            operator: In
-            values:
-              - linux
-          - key: node-role.kubernetes.io/worker
-            operator: In
-            values:
-              - worker
-          - key: type
-            operator: In
-            values:
-              - on-premise
-              - cloud
-          - key: provider
-            operator: In
-            values:
-              - host
-              - aws
-              - azure
-          - key: service
-            operator: In
-            values:
-              - virtualbox
-              - ec2
-              - eks
-              - aks
-          - key: region
-            operator: In
-            values:
-              - local
-              - ap-south-1
-              - centralindia
-          - key: availability_zone
-            operator: In
-            values:
-              - local-b
-              - ap-south-1b
-              - zone-2
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-controller-log-2
-spec:
-  storageClassName: standard
-  capacity:
-    storage: 2Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce 
-  persistentVolumeReclaimPolicy: Retain
-  local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/log/controller/2
-  claimRef:
-    namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-controller-log-kafka-controller-2
+    name: kafka-controller-log-2
   nodeAffinity:
     required:
       nodeSelectorTerms:

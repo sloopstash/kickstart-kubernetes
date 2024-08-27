@@ -60,6 +60,8 @@ spec:
         - name: main
           image: sloopstash/hadoop:v2.10.1
           imagePullPolicy: Always
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
           env:
             - name: JAVA_HOME
               value: /usr/java/jdk1.8.0_131/jre
@@ -69,69 +71,61 @@ spec:
               value: /usr/local/lib/hadoop/etc/hadoop
             - name: PATH
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/java/jdk1.8.0_131/jre/bin:/usr/local/lib/hadoop/bin
-            - name: ENVIRONMENT
-              valueFrom:
-                configMapKeyRef:
-                  name: hadoop-environment
-                  key: environment
-          command: ["/usr/bin/supervisord"]
-          args: ["-c", "/etc/supervisord.conf"]
           volumeMounts:
-            - name: hadoop-data-data
+            - name: hadoop-data
               mountPath: /opt/hadoop/data
-            - name: hadoop-data-log
+            - name: hadoop-log
               mountPath: /opt/hadoop/log
-            - name: hadoop-data-tmp
+            - name: hadoop-script
+              mountPath: /opt/hadoop/script
+            - name: hadoop-tmp
               mountPath: /opt/hadoop/tmp
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
-            - name: hadoop-data-supervisor
+            - name: hadoop-supervisor
               mountPath: /opt/hadoop/system/supervisor.ini
-              subPath: hadoop-data-supervisor
-            - name: hadoop-data-env
+              subPath: hadoop-supervisor
+            - name: hadoop-env
               mountPath: /opt/hadoop/conf/env.sh
-              subPath: hadoop-data-env
-            - name: hadoop-data-core-site
+              subPath: hadoop-env
+            - name: hadoop-core-site
               mountPath: /opt/hadoop/conf/core-site.xml
-              subPath: hadoop-data-core-site
-            - name: hadoop-data-hdfs-site
+              subPath: hadoop-core-site
+            - name: hadoop-hdfs-site
               mountPath: /opt/hadoop/conf/hdfs-site.xml
-              subPath: hadoop-data-hdfs-site
-            - name: hadoop-data-script
-              mountPath: /opt/hadoop/script
+              subPath: hadoop-hdfs-site
       volumes:
-        - name: hadoop-data-data
+        - name: hadoop-data
           persistentVolumeClaim:
-            claimName: hadoop-data-data
-        - name: hadoop-data-log
+            claimName: data
+        - name: hadoop-log
           persistentVolumeClaim:
-            claimName: hadoop-data-log
-        - name: hadoop-data-tmp
+            claimName: log
+        - name: hadoop-script
+          configMap:
+            name: hadoop-data
+        - name: hadoop-tmp
           persistentVolumeClaim:
-            claimName: hadoop-data-tmp
+            claimName: tmp
         - name: supervisor-server
           configMap:
             name: hadoop-data
-        - name: hadoop-data-supervisor
+        - name: hadoop-supervisor
           configMap:
             name: hadoop-data
-        - name: hadoop-data-env
+        - name: hadoop-env
           configMap:
             name: hadoop-data
-        - name: hadoop-data-core-site
+        - name: hadoop-core-site
           configMap:
             name: hadoop-data
-        - name: hadoop-data-hdfs-site
+        - name: hadoop-hdfs-site
           configMap:
             name: hadoop-data
-        - name: hadoop-data-script
-          hostPath:
-            path: ${HOME_DIR}/workload/hadoop/2.10.1/data/script
-            type: Directory
   volumeClaimTemplates:
     - metadata:
-        name: hadoop-data-data
+        name: data
       spec:
         storageClassName: standard
         volumeMode: Filesystem
@@ -139,9 +133,9 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 1Gi
+            storage: 5Gi
     - metadata:
-        name: hadoop-data-log
+        name: log
       spec:
         storageClassName: standard
         volumeMode: Filesystem
@@ -149,9 +143,9 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 1Gi
+            storage: 2Gi
     - metadata:
-        name: hadoop-data-tmp
+        name: tmp
       spec:
         storageClassName: standard
         volumeMode: Filesystem
@@ -159,4 +153,4 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 1Gi
+            storage: 5Gi

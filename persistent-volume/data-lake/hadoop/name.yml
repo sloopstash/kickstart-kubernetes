@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sloopstash-${ENVIRONMENT}-data-lake-s1-hadoop-name-data-0
+  name: sloopstash-${ENVIRONMENT}-data-lake-s1-hadoop-name-0-data
 spec:
   storageClassName: standard
   capacity:
@@ -11,10 +11,10 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/data/name/0
+    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/name/0/data
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-name-data-hadoop-name-0
+    name: hadoop-name-data-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -61,7 +61,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sloopstash-${ENVIRONMENT}-data-lake-s1-hadoop-name-log-0
+  name: sloopstash-${ENVIRONMENT}-data-lake-s1-hadoop-name-0-log
 spec:
   storageClassName: standard
   capacity:
@@ -71,10 +71,10 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/log/name/0
+    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/name/0/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-name-log-hadoop-name-0
+    name: hadoop-name-log-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -121,20 +121,20 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sloopstash-${ENVIRONMENT}-data-lake-s1-hadoop-name-tmp-0
+  name: sloopstash-${ENVIRONMENT}-data-lake-s1-hadoop-name-0-tmp
 spec:
   storageClassName: standard
   capacity:
-    storage: 1Gi
+    storage: 5Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/tmp/name/0
+    path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/name/0/tmp
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-name-tmp-hadoop-name-0
+    name: hadoop-name-tmp-0
   nodeAffinity:
     required:
       nodeSelectorTerms:

@@ -60,32 +60,27 @@ spec:
         - name: main
           image: sloopstash/kafka:v3.2.1
           imagePullPolicy: Always
-          env:
-            - name: KAFKA_OPTS
-              value: "-Djava.net.preferIPv4Stack=True"
-            - name: ENVIRONMENT
-              valueFrom:
-                configMapKeyRef:
-                  name: kafka-environment
-                  key: environment
           command: ["/usr/bin/supervisord"]
           args: ["-c", "/etc/supervisord.conf"]
+          env:
+            - name: ENVIRONMENT
+              value: ${ENVIRONMENT}
           volumeMounts:
-            - name: kafka-broker-data
+            - name: kafka-data
               mountPath: /opt/kafka/data
-            - name: kafka-broker-log
+            - name: kafka-log
               mountPath: /opt/kafka/log
+            - name: kafka-script
+              mountPath: /opt/kafka/script
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
-            - name: kafka-broker-supervisor
+            - name: kafka-supervisor
               mountPath: /opt/kafka/system/supervisor.ini
-              subPath: kafka-broker-supervisor
-            - name: kafka-broker-server
+              subPath: kafka-supervisor
+            - name: kafka-server
               mountPath: /opt/kafka/conf/server-reference.conf
-              subPath: kafka-broker-server
-            - name: kafka-broker-script
-              mountPath: /opt/kafka/script
+              subPath: kafka-server
           ports:
             - containerPort: 9092
           livenessProbe:
@@ -99,28 +94,27 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 10
       volumes:
-        - name: kafka-broker-data
+        - name: kafka-data
           persistentVolumeClaim:
-            claimName: kafka-broker-data
-        - name: kafka-broker-log
+            claimName: data
+        - name: kafka-log
           persistentVolumeClaim:
-            claimName: kafka-broker-log
+            claimName: log
+        - name: kafka-script
+          configMap:
+            name: kafka-broker
         - name: supervisor-server
           configMap:
             name: kafka-broker
-        - name: kafka-broker-supervisor
+        - name: kafka-supervisor
           configMap:
             name: kafka-broker
-        - name: kafka-broker-server
+        - name: kafka-server
           configMap:
             name: kafka-broker
-        - name: kafka-broker-script
-          hostPath:
-            path: ${HOME_DIR}/workload/kafka/3.2.1/broker/script
-            type: Directory
   volumeClaimTemplates:
     - metadata:
-        name: kafka-broker-data
+        name: data
       spec:
         storageClassName: standard
         volumeMode: Filesystem
@@ -128,9 +122,9 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 1Gi
+            storage: 5Gi
     - metadata:
-        name: kafka-broker-log
+        name: log
       spec:
         storageClassName: standard
         volumeMode: Filesystem
@@ -138,4 +132,4 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 1Gi
+            storage: 2Gi
