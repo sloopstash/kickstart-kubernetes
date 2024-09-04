@@ -14,7 +14,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/broker/0/data
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-broker-data-0
+    name: kafka-data-kafka-broker-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -74,7 +74,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/broker/0/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-broker-log-0
+    name: kafka-log-kafka-broker-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -134,7 +134,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/broker/1/data
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-broker-data-1
+    name: kafka-data-kafka-broker-1
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -194,7 +194,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/broker/1/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-broker-log-1
+    name: kafka-log-kafka-broker-1
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -254,7 +254,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/broker/2/data
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-broker-data-2
+    name: kafka-data-kafka-broker-2
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -314,7 +314,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/kafka/broker/2/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s2
-    name: kafka-broker-log-2
+    name: kafka-log-kafka-broker-2
   nodeAffinity:
     required:
       nodeSelectorTerms:

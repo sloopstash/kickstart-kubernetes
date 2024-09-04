@@ -14,7 +14,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/ctm/nginx/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-ctm
-    name: nginx-log
+    name: sloopstash-${ENVIRONMENT}-ctm-nginx-log
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -55,6 +55,5 @@ spec:
             operator: In
             values:
               - local-b
-              - local-c
               - ap-south-1b
               - zone-2

@@ -6,10 +6,12 @@ metadata:
     service: hadoop-name
 spec:
   ports:
-    - port: 9000
+    - name: metadata
+      port: 9000
       targetPort: 9000
       protocol: TCP
-    - port: 50070
+    - name: web
+      port: 50070
       targetPort: 50070
       protocol: TCP
   selector:

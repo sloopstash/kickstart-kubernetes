@@ -70,12 +70,12 @@ spec:
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
-            - name: redis-supervisor
+            - name: redis-conf
               mountPath: /opt/redis/system/supervisor.ini
-              subPath: redis-supervisor
-            - name: redis-server
+              subPath: supervisor.ini
+            - name: redis-conf
               mountPath: /opt/redis/conf/server.conf
-              subPath: redis-server
+              subPath: server.conf
           ports:
             - containerPort: 3000
           livenessProbe:
@@ -110,13 +110,15 @@ spec:
         - name: redis-log
           persistentVolumeClaim:
             claimName: redis-log
+        - name: redis-conf
+          configMap:
+            name: redis
+            items:
+              - key: server.conf
+                path: server.conf
+              - key: supervisor.ini
+                path: supervisor.ini
         - name: supervisor-server
-          configMap:
-            name: redis
-        - name: redis-supervisor
-          configMap:
-            name: redis
-        - name: redis-server
           configMap:
             name: redis
   volumeClaimTemplates:

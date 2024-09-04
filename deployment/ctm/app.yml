@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       service: app
-  replicas: 2
+  replicas: 3
   template:
     metadata:
       labels:
@@ -53,13 +53,12 @@ spec:
                   operator: In
                   values:
                     - local-c
-                    - local-b
                     - ap-south-1a
                     - zone-1
       containers:
         - name: main
           image: sloopstash/node-js:v14.16.0
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command: ["/usr/bin/supervisord"]
           args: ["-c", "/etc/supervisord.conf"]
           volumeMounts:
@@ -82,7 +81,7 @@ spec:
               port: 2000
               httpHeaders:
                 - name: Host
-                  value: app.ctm
+                  value: localhost
             initialDelaySeconds: 15
             periodSeconds: 20
           readinessProbe:
@@ -111,7 +110,7 @@ spec:
             type: Directory
         - name: app-log
           persistentVolumeClaim:
-            claimName: app-log
+            claimName: sloopstash-${ENVIRONMENT}-ctm-app-log
         - name: supervisor-server
           configMap:
             name: app

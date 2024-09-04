@@ -14,7 +14,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/ctm/app/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-ctm
-    name: app-log
+    name: sloopstash-${ENVIRONMENT}-ctm-app-log
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -55,6 +55,5 @@ spec:
             operator: In
             values:
               - local-c
-              - local-b
               - ap-south-1a
               - zone-1

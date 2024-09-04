@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nginx-log
+  name: sloopstash-${ENVIRONMENT}-ctm-nginx-log
 spec:
   storageClassName: standard
   volumeName: sloopstash-${ENVIRONMENT}-ctm-nginx-log

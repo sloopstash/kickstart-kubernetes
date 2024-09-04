@@ -70,17 +70,21 @@ spec:
               mountPath: /opt/kafka/data
             - name: kafka-log
               mountPath: /opt/kafka/log
-            - name: kafka-script
-              mountPath: /opt/kafka/script
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
-            - name: kafka-supervisor
+            - name: kafka-conf
               mountPath: /opt/kafka/system/supervisor.ini
-              subPath: kafka-supervisor
-            - name: kafka-server
+              subPath: supervisor.ini
+            - name: kafka-conf
               mountPath: /opt/kafka/conf/server-reference.conf
-              subPath: kafka-server
+              subPath: server.conf
+            - name: kafka-script
+              mountPath: /opt/kafka/script/start.sh
+              subPath: start.sh
+            - name: kafka-script
+              mountPath: /opt/kafka/script/stop.sh
+              subPath: stop.sh
           ports:
             - containerPort: 9093
           livenessProbe:
@@ -96,25 +100,33 @@ spec:
       volumes:
         - name: kafka-data
           persistentVolumeClaim:
-            claimName: data
+            claimName: kafka-data
         - name: kafka-log
           persistentVolumeClaim:
-            claimName: log
+            claimName: kafka-log
+        - name: kafka-conf
+          configMap:
+            name: kafka-controller  
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+              - key: server.conf
+                path: server.conf
         - name: kafka-script
           configMap:
             name: kafka-controller
+            defaultMode: 0755
+            items:
+              - key: start.sh
+                path: start.sh
+              - key: stop.sh
+                path: stop.sh
         - name: supervisor-server
-          configMap:
-            name: kafka-controller
-        - name: kafka-supervisor
-          configMap:
-            name: kafka-controller
-        - name: kafka-server
           configMap:
             name: kafka-controller
   volumeClaimTemplates:
     - metadata:
-        name: data
+        name: kafka-data
       spec:
         storageClassName: standard
         volumeMode: Filesystem
@@ -124,7 +136,7 @@ spec:
           requests:
             storage: 5Gi
     - metadata:
-        name: log
+        name: kafka-log
       spec:
         storageClassName: standard
         volumeMode: Filesystem

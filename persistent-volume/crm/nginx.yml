@@ -14,7 +14,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/crm/nginx/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-crm
-    name: nginx-log
+    name: sloopstash-${ENVIRONMENT}-crm-nginx-log
   nodeAffinity:
     required:
       nodeSelectorTerms:
