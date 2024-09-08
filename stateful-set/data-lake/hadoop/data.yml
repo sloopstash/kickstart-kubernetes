@@ -81,22 +81,22 @@ spec:
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
-            - name: hadoop-conf
+            - name: hadoop-supervisor
               mountPath: /opt/hadoop/system/supervisor.ini
               subPath: supervisor.ini
-            - name: hadoop-conf
+            - name: hadoop-env
               mountPath: /opt/hadoop/conf/env.sh
               subPath: env.sh
-            - name: hadoop-conf
+            - name: hadoop-core-site
               mountPath: /opt/hadoop/conf/core-site.xml
               subPath: core-site.xml
-            - name: hadoop-conf
+            - name: hadoop-hdfs-site
               mountPath: /opt/hadoop/conf/hdfs-site.xml
               subPath: hdfs-site.xml
-            - name: hadoop-script
+            - name: hadoop-start
               mountPath: /opt/hadoop/script/start.sh
               subPath: start.sh
-            - name: hadoop-script
+            - name: hadoop-stop
               mountPath: /opt/hadoop/script/stop.sh
               subPath: stop.sh
           ports:
@@ -109,33 +109,50 @@ spec:
         - name: hadoop-log
           persistentVolumeClaim:
             claimName: hadoop-log
-        - name: hadoop-conf
-          configMap:
-            name: hadoop-data
-            items:
-              - key: supervisor.ini
-                path: supervisor.ini
-              - key: env.sh
-                path: env.sh
-              - key: core-site.xml
-                path: core-site.xml
-              - key: hdfs-site.xml
-                path: hdfs-site.xml
-        - name: hadoop-script
-          configMap:
-            name: hadoop-data
-            defaultMode: 0755
-            items:
-              - key: start.sh
-                path: start.sh
-              - key: stop.sh
-                path: stop.sh
         - name: hadoop-tmp
           persistentVolumeClaim:
             claimName: hadoop-tmp
         - name: supervisor-server
           configMap:
             name: hadoop-data
+        - name: hadoop-supervisor
+          configMap:
+            name: hadoop-data
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+        - name: hadoop-env
+          configMap:
+            name: hadoop-data
+            items:
+              - key: env.sh
+                path: env.sh
+        - name: hadoop-core-site
+          configMap:
+            name: hadoop-data
+            items:
+              - key: core-site.xml
+                path: core-site.xml
+        - name: hadoop-hdfs-site
+          configMap:
+            name: hadoop-data
+            items:
+              - key: hdfs-site.xml
+                path: hdfs-site.xml
+        - name: hadoop-start
+          configMap:
+            name: hadoop-data
+            defaultMode: 0755
+            items:
+              - key: start.sh
+                path: start.sh
+        - name: hadoop-stop
+          configMap:
+            name: hadoop-data
+            defaultMode: 0755
+            items:
+              - key: stop.sh
+                path: stop.sh
   volumeClaimTemplates:
     - metadata:
         name: hadoop-data

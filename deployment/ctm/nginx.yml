@@ -69,10 +69,10 @@ spec:
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
-            - name: nginx-conf
+            - name: nginx-supervisor
               mountPath: /opt/nginx/system/supervisor.ini
               subPath: supervisor.ini
-            - name: nginx-conf
+            - name: nginx-server
               mountPath: /opt/nginx/conf/server.conf
               subPath: server.conf
             - name: nginx-app
@@ -117,17 +117,21 @@ spec:
         - name: nginx-log
           persistentVolumeClaim:
             claimName: sloopstash-${ENVIRONMENT}-ctm-nginx-log
-        - name: nginx-conf
+        - name: supervisor-server
+          configMap:
+            name: nginx
+        - name: nginx-supervisor
+          configMap:
+            name: nginx
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+        - name: nginx-server
           configMap:
             name: nginx
             items:
               - key: server.conf
                 path: server.conf
-              - key: supervisor.ini
-                path: supervisor.ini
-        - name: supervisor-server
-          configMap:
-            name: nginx
         - name: nginx-app
           configMap:
             name: nginx

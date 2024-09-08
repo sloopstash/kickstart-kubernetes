@@ -70,10 +70,10 @@ spec:
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
-            - name: redis-conf
+            - name: redis-supervisor
               mountPath: /opt/redis/system/supervisor.ini
               subPath: supervisor.ini
-            - name: redis-conf
+            - name: redis-server
               mountPath: /opt/redis/conf/server.conf
               subPath: server.conf
           ports:
@@ -110,17 +110,21 @@ spec:
         - name: redis-log
           persistentVolumeClaim:
             claimName: redis-log
-        - name: redis-conf
+        - name: supervisor-server
+          configMap:
+            name: redis
+        - name: redis-supervisor
+          configMap:
+            name: redis
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+        - name: redis-server
           configMap:
             name: redis
             items:
               - key: server.conf
                 path: server.conf
-              - key: supervisor.ini
-                path: supervisor.ini
-        - name: supervisor-server
-          configMap:
-            name: redis
   volumeClaimTemplates:
     - metadata:
         name: redis-data

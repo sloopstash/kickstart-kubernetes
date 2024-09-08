@@ -73,16 +73,16 @@ spec:
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
-            - name: kafka-conf
+            - name: kafka-supervisor
               mountPath: /opt/kafka/system/supervisor.ini
               subPath: supervisor.ini
-            - name: kafka-conf
+            - name: kafka-server
               mountPath: /opt/kafka/conf/server-reference.conf
               subPath: server.conf
-            - name: kafka-script
+            - name: kafka-start
               mountPath: /opt/kafka/script/start.sh
               subPath: start.sh
-            - name: kafka-script
+            - name: kafka-stop
               mountPath: /opt/kafka/script/stop.sh
               subPath: stop.sh
           ports:
@@ -104,26 +104,35 @@ spec:
         - name: kafka-log
           persistentVolumeClaim:
             claimName: kafka-log
-        - name: kafka-conf
+        - name: supervisor-server
           configMap:
-            name: kafka-controller  
+            name: kafka-controller
+        - name: kafka-supervisor
+          configMap:
+            name: kafka-controller
             items:
               - key: supervisor.ini
                 path: supervisor.ini
+        - name: kafka-server
+          configMap:
+            name: kafka-controller
+            items:
               - key: server.conf
                 path: server.conf
-        - name: kafka-script
+        - name: kafka-start
           configMap:
             name: kafka-controller
             defaultMode: 0755
             items:
               - key: start.sh
                 path: start.sh
-              - key: stop.sh
-                path: stop.sh
-        - name: supervisor-server
+        - name: kafka-stop
           configMap:
             name: kafka-controller
+            defaultMode: 0755
+            items:
+              - key: stop.sh
+                path: stop.sh
   volumeClaimTemplates:
     - metadata:
         name: kafka-data

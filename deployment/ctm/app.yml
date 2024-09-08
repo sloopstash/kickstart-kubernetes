@@ -61,6 +61,9 @@ spec:
           imagePullPolicy: Always
           command: ["/usr/bin/supervisord"]
           args: ["-c", "/etc/supervisord.conf"]
+          env:
+            - name: STATIC_ENDPOINT
+              value: http://app-static.ctm.${EXTERNAL_DOMAIN}:${CTM_NGINX_PORT}
           volumeMounts:
             - name: app-source
               mountPath: /opt/app/source

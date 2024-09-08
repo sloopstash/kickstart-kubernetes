@@ -58,7 +58,7 @@ spec:
                       - zone-2
       containers:
         - name: main
-          image: 'sloopstash/mongo-db:v4.4.4'
+          image: sloopstash/mongo-db:v4.4.4
           imagePullPolicy: Always
           command: ["/usr/bin/supervisord"]
           args: ["-c", "/etc/supervisord.conf"]
@@ -70,10 +70,10 @@ spec:
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
-            - name: mongo-db-conf
+            - name: mongo-db-supervisor
               mountPath: /opt/mongo-db/system/supervisor.ini
               subPath: supervisor.ini
-            - name: mongo-db-conf
+            - name: mongo-db-server
               mountPath: /opt/mongo-db/conf/server.conf
               subPath: server.conf
           ports:
@@ -81,11 +81,11 @@ spec:
           livenessProbe:
             exec:
               command:
-                - mongo
-                - '--port'
-                - '7000'
-                - '--eval'
-                - db.adminCommand('ping')
+                - "mongo"
+                - "--port"
+                - "7000"
+                - "--eval"
+                - "db.adminCommand('ping')"
             initialDelaySeconds: 15
             periodSeconds: 20
           readinessProbe:
@@ -94,7 +94,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
         - name: log
-          image: 'sloopstash/mongo-db:v4.4.4'
+          image: sloopstash/mongo-db:v4.4.4
           imagePullPolicy: IfNotPresent
           command: ["/usr/bin/supervisord"]
           args: ["-c", "/etc/supervisord.conf"]
@@ -111,17 +111,21 @@ spec:
         - name: mongo-db-log
           persistentVolumeClaim:
             claimName: mongo-db-log
-        - name: mongo-db-conf
+        - name: supervisor-server
+          configMap:
+            name: mongo-db
+        - name: mongo-db-supervisor
+          configMap:
+            name: mongo-db
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+        - name: mongo-db-server
           configMap:
             name: mongo-db
             items:
               - key: server.conf
                 path: server.conf
-              - key: supervisor.ini
-                path: supervisor.ini
-        - name: supervisor-server
-          configMap:
-            name: mongo-db
   volumeClaimTemplates:
     - metadata:
         name: mongo-db-data
