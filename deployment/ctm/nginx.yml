@@ -53,27 +53,28 @@ spec:
                   operator: In
                   values:
                     - local-b
-                    - local-c
                     - ap-south-1b
                     - zone-2
       containers:
         - name: main
           image: sloopstash/nginx:v1.14.0
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command: ["/usr/bin/supervisord"]
           args: ["-c", "/etc/supervisord.conf"]
           volumeMounts:
+            - name: app-source
+              mountPath: /opt/app/source
             - name: nginx-log
               mountPath: /opt/nginx/log
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
-            - name: nginx-supervisor
+            - name: nginx-conf
               mountPath: /opt/nginx/system/supervisor.ini
-              subPath: nginx-supervisor
-            - name: nginx-server
+              subPath: supervisor.ini
+            - name: nginx-conf
               mountPath: /opt/nginx/conf/server.conf
-              subPath: nginx-server
+              subPath: server.conf
             - name: nginx-app
               mountPath: /opt/nginx/conf/app.conf
               subPath: nginx-app
@@ -109,16 +110,22 @@ spec:
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
       volumes:
+        - name: app-source
+          hostPath:
+            path: ${CTM_APP_SOURCE}
+            type: Directory
         - name: nginx-log
           persistentVolumeClaim:
-            claimName: nginx-log
+            claimName: sloopstash-${ENVIRONMENT}-ctm-nginx-log
+        - name: nginx-conf
+          configMap:
+            name: nginx
+            items:
+              - key: server.conf
+                path: server.conf
+              - key: supervisor.ini
+                path: supervisor.ini
         - name: supervisor-server
-          configMap:
-            name: nginx
-        - name: nginx-supervisor
-          configMap:
-            name: nginx
-        - name: nginx-server
           configMap:
             name: nginx
         - name: nginx-app

@@ -14,7 +14,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/crm/app/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-crm
-    name: app-log
+    name: sloopstash-${ENVIRONMENT}-crm-app-log
   nodeAffinity:
     required:
       nodeSelectorTerms:

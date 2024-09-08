@@ -14,7 +14,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/data/0/data
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-data-data-0
+    name: hadoop-data-hadoop-data-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -74,7 +74,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/data/0/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-data-log-0
+    name: hadoop-log-hadoop-data-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -134,7 +134,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/data/0/tmp
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-data-tmp-0
+    name: hadoop-tmp-hadoop-data-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -194,7 +194,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/data/1/data
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-data-data-1
+    name: hadoop-data-hadoop-data-1
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -254,7 +254,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/data/1/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-data-log-1
+    name: hadoop-log-hadoop-data-1
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -314,7 +314,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/data/1/tmp
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-data-tmp-1
+    name: hadoop-tmp-hadoop-data-1
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -374,7 +374,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/data/2/data
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-data-data-2
+    name: hadoop-data-hadoop-data-2
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -434,7 +434,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/data/2/log
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-data-log-2
+    name: hadoop-log-hadoop-data-2
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -494,7 +494,7 @@ spec:
     path: /mnt/sloopstash/${ENVIRONMENT}/data-lake/hadoop/data/2/tmp
   claimRef:
     namespace: sloopstash-${ENVIRONMENT}-data-lake-s1
-    name: hadoop-data-tmp-2
+    name: hadoop-tmp-hadoop-data-2
   nodeAffinity:
     required:
       nodeSelectorTerms:

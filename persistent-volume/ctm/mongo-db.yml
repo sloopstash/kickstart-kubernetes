@@ -1,17 +1,20 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sloopstash-${ENVIRONMENT}-ctm-mongo-db-data
+  name: sloopstash-${ENVIRONMENT}-ctm-mongo-db-0-data
 spec:
   storageClassName: standard
   capacity:
-   storage: 2Gi
+   storage: 5Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/ctm/mongo-db/data
+    path: /mnt/sloopstash/${ENVIRONMENT}/ctm/mongo-db/0/data
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-ctm
+    name: mongo-db-data-mongo-db-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -52,24 +55,26 @@ spec:
             operator: In
             values:
               - local-b
-              - local-c
               - ap-south-1b
               - zone-2
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sloopstash-${ENVIRONMENT}-ctm-mongo-db-log
+  name: sloopstash-${ENVIRONMENT}-ctm-mongo-db-0-log
 spec:
   storageClassName: standard
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/ctm/mongo-db/log
+    path: /mnt/sloopstash/${ENVIRONMENT}/ctm/mongo-db/0/log
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-ctm
+    name: mongo-db-log-mongo-db-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -110,6 +115,5 @@ spec:
             operator: In
             values:
               - local-b
-              - local-c
               - ap-south-1b
               - zone-2

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sloopstash-${ENVIRONMENT}-crm-redis-data
+  name: sloopstash-${ENVIRONMENT}-crm-redis-0-data
 spec:
   storageClassName: standard
   capacity:
@@ -11,7 +11,10 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/crm/redis/data
+    path: /mnt/sloopstash/${ENVIRONMENT}/crm/redis/0/data
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-crm
+    name: redis-data-redis-0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -58,7 +61,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sloopstash-${ENVIRONMENT}-crm-redis-log
+  name: sloopstash-${ENVIRONMENT}-crm-redis-0-log
 spec:
   storageClassName: standard
   capacity:
@@ -68,7 +71,10 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   local:
-    path: /mnt/sloopstash/${ENVIRONMENT}/crm/redis/log
+    path: /mnt/sloopstash/${ENVIRONMENT}/crm/redis/0/log
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-crm
+    name: redis-log-redis-0
   nodeAffinity:
     required:
       nodeSelectorTerms:

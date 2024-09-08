@@ -76,59 +76,69 @@ spec:
               mountPath: /opt/hadoop/data
             - name: hadoop-log
               mountPath: /opt/hadoop/log
-            - name: hadoop-script
-              mountPath: /opt/hadoop/script
             - name: hadoop-tmp
               mountPath: /opt/hadoop/tmp
             - name: supervisor-server
               mountPath: /etc/supervisord.conf
               subPath: supervisor-server
-            - name: hadoop-supervisor
+            - name: hadoop-conf
               mountPath: /opt/hadoop/system/supervisor.ini
-              subPath: hadoop-supervisor
-            - name: hadoop-env
+              subPath: supervisor.ini
+            - name: hadoop-conf
               mountPath: /opt/hadoop/conf/env.sh
-              subPath: hadoop-env
-            - name: hadoop-core-site
+              subPath: env.sh
+            - name: hadoop-conf
               mountPath: /opt/hadoop/conf/core-site.xml
-              subPath: hadoop-core-site
-            - name: hadoop-hdfs-site
+              subPath: core-site.xml
+            - name: hadoop-conf
               mountPath: /opt/hadoop/conf/hdfs-site.xml
-              subPath: hadoop-hdfs-site
+              subPath: hdfs-site.xml
+            - name: hadoop-script
+              mountPath: /opt/hadoop/script/start.sh
+              subPath: start.sh
+            - name: hadoop-script
+              mountPath: /opt/hadoop/script/stop.sh
+              subPath: stop.sh
           ports:
             - containerPort: 9000
             - containerPort: 50070
       volumes:
         - name: hadoop-data
           persistentVolumeClaim:
-            claimName: data
+            claimName: hadoop-data
         - name: hadoop-log
           persistentVolumeClaim:
-            claimName: log
+            claimName: hadoop-log
+        - name: hadoop-conf
+          configMap:
+            name: hadoop-name          
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+              - key: env.sh
+                path: env.sh
+              - key: core-site.xml
+                path: core-site.xml
+              - key: hdfs-site.xml
+                path: hdfs-site.xml
         - name: hadoop-script
           configMap:
             name: hadoop-name
+            defaultMode: 0755
+            items:
+              - key: start.sh
+                path: start.sh
+              - key: stop.sh
+                path: stop.sh
         - name: hadoop-tmp
           persistentVolumeClaim:
-            claimName: tmp
+            claimName: hadoop-tmp
         - name: supervisor-server
-          configMap:
-            name: hadoop-name
-        - name: hadoop-supervisor
-          configMap:
-            name: hadoop-name
-        - name: hadoop-env
-          configMap:
-            name: hadoop-name
-        - name: hadoop-core-site
-          configMap:
-            name: hadoop-name
-        - name: hadoop-hdfs-site
           configMap:
             name: hadoop-name
   volumeClaimTemplates:
     - metadata:
-        name: data
+        name: hadoop-data
       spec:
         storageClassName: standard
         volumeMode: Filesystem
@@ -138,7 +148,7 @@ spec:
           requests:
             storage: 5Gi
     - metadata:
-        name: log
+        name: hadoop-log
       spec:
         storageClassName: standard
         volumeMode: Filesystem
@@ -148,7 +158,7 @@ spec:
           requests:
             storage: 2Gi
     - metadata:
-        name: tmp
+        name: hadoop-tmp
       spec:
         storageClassName: standard
         volumeMode: Filesystem

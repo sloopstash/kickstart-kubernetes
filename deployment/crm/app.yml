@@ -113,7 +113,7 @@ spec:
             type: Directory
         - name: app-log
           persistentVolumeClaim:
-            claimName: app-log
+            claimName: sloopstash-${ENVIRONMENT}-crm-app-log
         - name: supervisor-server
           configMap:
             name: app
