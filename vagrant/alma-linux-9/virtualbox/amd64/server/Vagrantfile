@@ -106,6 +106,15 @@ Vagrant.configure("2") do |config|
       vb.name = "sloopstash-k8s-mtr-1"
     end
   end
+  config.vm.define "sloopstash-k8s-mtr-2" do |sloopstash_k8s_mtr_2|
+    sloopstash_k8s_mtr_2.vm.hostname = "sloopstash-k8s-mtr-2"
+    sloopstash_k8s_mtr_2.vm.network "private_network", ip: "192.168.101.62"
+    sloopstash_k8s_mtr_2.vm.provider "virtualbox" do |vb|
+      vb.memory = "3072"
+      vb.cpus = "2"
+      vb.name = "sloopstash-k8s-mtr-2"
+    end
+  end
   config.vm.define "sloopstash-k8s-wkr-1" do |sloopstash_k8s_wkr_1|
     sloopstash_k8s_wkr_1.vm.hostname = "sloopstash-k8s-wkr-1"
     sloopstash_k8s_wkr_1.vm.network "private_network", ip: "192.168.101.64"
@@ -122,6 +131,15 @@ Vagrant.configure("2") do |config|
       vb.memory = "2048"
       vb.cpus = "1"
       vb.name = "sloopstash-k8s-wkr-2"
+    end
+  end
+  config.vm.define "sloopstash-k8s-wkr-3" do |sloopstash_k8s_wkr_3|
+    sloopstash_k8s_wkr_3.vm.hostname = "sloopstash-k8s-wkr-3"
+    sloopstash_k8s_wkr_3.vm.network "private_network", ip: "192.168.101.66"
+    sloopstash_k8s_wkr_3.vm.provider "virtualbox" do |vb|
+      vb.memory = "2048"
+      vb.cpus = "1"
+      vb.name = "sloopstash-k8s-wkr-3"
     end
   end
 end
