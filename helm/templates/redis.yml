@@ -1,0 +1,289 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-{{.Values.environment}}-crm-redis-0-data
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/{{.Values.environment}}/crm/redis/0/data
+  claimRef:
+    namespace: sloopstash-{{.Values.environment}}-crm
+    name: redis-data-redis-0
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+                - linux
+            - key: node-role.kubernetes.io/worker
+              operator: In
+              values:
+                - worker
+            - key: type
+              operator: In
+              values:
+                - on-premise
+                - cloud
+            - key: provider
+              operator: In
+              values:
+                - host
+                - aws
+                - azure
+            - key: service
+              operator: In
+              values:
+                - virtualbox
+                - ec2
+                - eks
+                - aks
+            - key: region
+              operator: In
+              values:
+                - local
+                - ap-south-1
+                - centralindia
+            - key: availability_zone
+              operator: In
+              values:
+                - local-b
+                - ap-south-1b
+                - zone-2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-{{.Values.environment}}-crm-redis-0-log
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/{{.Values.environment}}/crm/redis/0/log
+  claimRef:
+    namespace: sloopstash-{{.Values.environment}}-crm
+    name: redis-log-redis-0
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+                - linux
+            - key: node-role.kubernetes.io/worker
+              operator: In
+              values:
+                - worker
+            - key: type
+              operator: In
+              values:
+                - on-premise
+                - cloud
+            - key: provider
+              operator: In
+              values:
+                - host
+                - aws
+                - azure
+            - key: service
+              operator: In
+              values:
+                - virtualbox
+                - ec2
+                - eks
+                - aks
+            - key: region
+              operator: In
+              values:
+                - local
+                - ap-south-1
+                - centralindia
+            - key: availability_zone
+              operator: In
+              values:
+                - local-b
+                - ap-south-1b
+                - zone-2
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  selector:
+    matchLabels:
+      service: redis
+  replicas: {{.Values.redis_replicas}}
+  serviceName: redis
+  template:
+    metadata:
+      labels:
+        service: redis
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux
+                  - key: node-role.kubernetes.io/worker
+                    operator: In
+                    values:
+                      - worker
+                  - key: type
+                    operator: In
+                    values:
+                      - on-premise
+                      - cloud
+                  - key: provider
+                    operator: In
+                    values:
+                      - host
+                      - aws
+                      - azure
+                  - key: service
+                    operator: In
+                    values:
+                      - virtualbox
+                      - ec2
+                      - eks
+                      - aks
+                  - key: region
+                    operator: In
+                    values:
+                      - local
+                      - ap-south-1
+                      - centralindia
+                  - key: availability_zone
+                    operator: In
+                    values:
+                      - local-b
+                      - ap-south-1b
+                      - zone-2
+      containers:
+        - name: main
+          image: sloopstash/redis:v{{.Values.redis_version}}
+          imagePullPolicy: Always
+          command:
+            - /usr/bin/supervisord
+          args:
+            - -c
+            - /etc/supervisord.conf
+          volumeMounts:
+            - name: redis-data
+              mountPath: /opt/redis/data
+            - name: redis-log
+              mountPath: /opt/redis/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: redis-supervisor
+              mountPath: /opt/redis/system/supervisor.ini
+              subPath: supervisor.ini
+            - name: redis-server
+              mountPath: /opt/redis/conf/server.conf
+              subPath: server.conf
+          ports:
+            - containerPort: 3000
+          livenessProbe:
+            exec:
+              command:
+                - /usr/local/bin/redis-cli
+                - -p
+                - "3000"
+                - PING
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+        - name: log
+          image: sloopstash/redis:v{{.Values.redis_version}}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /usr/bin/supervisord
+          args:
+            - -c
+            - /etc/supervisord.conf
+          volumeMounts:
+            - name: redis-log
+              mountPath: /opt/redis/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-data
+        - name: redis-log
+          persistentVolumeClaim:
+            claimName: redis-log
+        - name: supervisor-server
+          configMap:
+            name: redis
+        - name: redis-supervisor
+          configMap:
+            name: redis
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+        - name: redis-server
+          configMap:
+            name: redis
+            items:
+              - key: server.conf
+                path: server.conf
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: redis-log
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    service: redis
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    service: redis

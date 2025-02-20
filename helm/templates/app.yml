@@ -1,0 +1,211 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-{{.Values.environment}}-crm-app-log
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/{{.Values.environment}}/crm/app/log
+  claimRef:
+    namespace: sloopstash-{{.Values.environment}}-crm
+    name: sloopstash-{{.Values.environment}}-crm-app-log
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+              - cloud
+          - key: provider
+            operator: In
+            values:
+              - host
+              - aws
+              - azure
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+              - ec2
+              - eks
+              - aks
+          - key: region
+            operator: In
+            values:
+              - local
+              - ap-south-1
+              - centralindia
+          - key: availability_zone
+            operator: In
+            values:
+              - local-c
+              - ap-south-1a
+              - zone-1
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sloopstash-{{.Values.environment}}-crm-app-log
+spec:
+  storageClassName: standard
+  volumeName: sloopstash-{{.Values.environment}}-crm-app-log
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  selector:
+    matchLabels:
+      service: app
+  replicas: {{.Values.app_replicas}}
+  template:
+    metadata:
+      labels:
+        service: app
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                    - cloud
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                    - aws
+                    - azure
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                    - ec2
+                    - eks
+                    - aks
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                    - ap-south-1
+                    - centralindia
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-c
+                    - ap-south-1a
+                    - zone-1
+      containers:
+        - name: main
+          image: sloopstash/python:v{{.Values.python_version}}
+          imagePullPolicy: Always
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          env:
+            - name: STATIC_ENDPOINT
+              value: http://app-static.crm.{{.Values.external_domain}}:{{.Values.nginx_port}}
+          volumeMounts:
+            - name: app-source
+              mountPath: /opt/app/source
+            - name: app-log
+              mountPath: /opt/app/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: app-supervisor
+              mountPath: /opt/app/system/supervisor.ini
+              subPath: app-supervisor
+          ports:
+            - containerPort: 2000
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /health
+              port: 2000
+              httpHeaders:
+                - name: Host
+                  value: localhost
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            exec:
+              command:
+                - "/usr/bin/supervisorctl"
+                - "status"
+                - "app"
+            initialDelaySeconds: 5
+            periodSeconds: 10
+        - name: log
+          image: sloopstash/python:v{{.Values.python_version}}
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: app-log
+              mountPath: /opt/app/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+      volumes:
+        - name: app-source
+          hostPath:
+            path: {{ .Values.app_source }}
+            type: Directory
+        - name: app-log
+          persistentVolumeClaim:
+            claimName: sloopstash-{{.Values.environment}}-crm-app-log
+        - name: supervisor-server
+          configMap:
+            name: app
+        - name: app-supervisor
+          configMap:
+            name: app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  labels:
+    service: app
+spec:
+  ports:
+    - port: 2000
+      targetPort: 2000
+      protocol: TCP
+  selector:
+    service: app

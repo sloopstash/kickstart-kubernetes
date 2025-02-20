@@ -1,0 +1,14 @@
+environment: qab
+external_domain: sloopstash.qab
+internal_domain: sloopstash-qab.internal
+home_dir: /opt/kickstart-kubernetes
+
+redis_version: 4.0.9
+nginx_version: 1.14.0
+python_version: 2.7
+app_source: /opt/sloopstash-crm-app
+nginx_port: 30003
+
+redis_replicas: 1
+nginx_replicas: 2
+app_replicas: 3

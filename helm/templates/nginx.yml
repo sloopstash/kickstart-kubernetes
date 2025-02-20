@@ -1,0 +1,230 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-{{.Values.environment}}-crm-nginx-log
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/{{.Values.environment}}/crm/nginx/log
+  claimRef:
+    namespace: sloopstash-{{.Values.environment}}-crm
+    name: sloopstash-{{.Values.environment}}-crm-nginx-log
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+              - cloud
+          - key: provider
+            operator: In
+            values:
+              - host
+              - aws
+              - azure
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+              - ec2
+              - eks
+              - aks
+          - key: region
+            operator: In
+            values:
+              - local
+              - ap-south-1
+              - centralindia
+          - key: availability_zone
+            operator: In
+            values:
+              - local-b
+              - ap-south-1b
+              - zone-2
+---
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sloopstash-{{.Values.environment}}-crm-nginx-log
+spec:
+  storageClassName: standard
+  volumeName: sloopstash-{{.Values.environment}}-crm-nginx-log
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  selector:
+    matchLabels:
+      service: nginx
+  replicas: {{.Values.nginx_replicas}}
+  template:
+    metadata:
+      labels:
+        service: nginx
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                    - cloud
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                    - aws
+                    - azure
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                    - ec2
+                    - eks
+                    - aks
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                    - ap-south-1
+                    - centralindia
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-b
+                    - ap-south-1b
+                    - zone-2
+      containers:
+        - name: main
+          image: sloopstash/nginx:v{{.Values.nginx_version}}
+          imagePullPolicy: Always
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: app-source
+              mountPath: /opt/app/source
+            - name: nginx-log
+              mountPath: /opt/nginx/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: nginx-supervisor
+              mountPath: /opt/nginx/system/supervisor.ini
+              subPath: supervisor.ini
+            - name: nginx-server
+              mountPath: /opt/nginx/conf/server.conf
+              subPath: server.conf
+            - name: nginx-app
+              mountPath: /opt/nginx/conf/app.conf
+              subPath: nginx-app
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /
+              port: 80
+              httpHeaders:
+                - name: Host
+                  value: localhost
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            exec:
+              command:
+                - "/usr/bin/supervisorctl"
+                - "status"
+                - "nginx"
+            initialDelaySeconds: 5
+            periodSeconds: 10
+        - name: log
+          image: sloopstash/nginx:v{{.Values.nginx_version}}
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: nginx-log
+              mountPath: /opt/nginx/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+      volumes:
+        - name: app-source
+          hostPath:
+            path: {{.Values.app_source }}
+            type: Directory
+        - name: nginx-log
+          persistentVolumeClaim:
+            claimName: sloopstash-{{.Values.environment}}-crm-nginx-log
+        - name: supervisor-server
+          configMap:
+            name: nginx
+        - name: nginx-supervisor
+          configMap:
+            name: nginx
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+        - name: nginx-server
+          configMap:
+            name: nginx
+            items:
+              - key: server.conf
+                path: server.conf
+        - name: nginx-app
+          configMap:
+            name: nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    service: nginx
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      nodePort: {{.Values.nginx_port}}
+      targetPort: 80
+      protocol: TCP
+  selector:
+    service: nginx
