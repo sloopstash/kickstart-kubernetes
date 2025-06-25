@@ -1,9 +1,8 @@
-# Kickstart Kubernetes
-Orchestrate and automate OCI containers running popular fullstacks, microservices, and Big Data workloads using Containerd, Docker, and Kubernetes.
+# SloopStash Kubernetes starter-kit
 
 
 ## Getting started
-Please refer to the [wiki](https://github.com/sloopstash/kickstart-kubernetes/wiki) for detailed instructions on how to get started with our Kubernetes starter-kit.
+Please refer to the [documentation](https://sloopstash.com/documentation/toolkit/container/kubernetes/index.html) for detailed instructions on how to get started with SloopStash Kubernetes starter-kit.
 
 
 ## Get support
