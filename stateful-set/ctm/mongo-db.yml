@@ -58,8 +58,8 @@ spec:
                       - zone-2
       containers:
         - name: main
-          image: sloopstash/mongo-db:v4.4.4
-          imagePullPolicy: Always
+          image: sloopstash/mongo-db:v${CTM_MONGO_DB_VERSION}
+          imagePullPolicy: IfNotPresent
           command: ["/usr/bin/supervisord"]
           args: ["-c", "/etc/supervisord.conf"]
           volumeMounts:
@@ -94,7 +94,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
         - name: log
-          image: sloopstash/mongo-db:v4.4.4
+          image: sloopstash/mongo-db:v${CTM_MONGO_DB_VERSION}
           imagePullPolicy: IfNotPresent
           command: ["/usr/bin/supervisord"]
           args: ["-c", "/etc/supervisord.conf"]

@@ -57,8 +57,8 @@ spec:
                     - zone-1
       containers:
         - name: main
-          image: sloopstash/node-js:v14.16.0
-          imagePullPolicy: Always
+          image: sloopstash/node-js:v${CTM_NODE_JS_VERSION}
+          imagePullPolicy: IfNotPresent
           command: ["/usr/bin/supervisord"]
           args: ["-c", "/etc/supervisord.conf"]
           env:
@@ -96,7 +96,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
         - name: log
-          image: sloopstash/node-js:v14.16.0
+          image: sloopstash/node-js:v${CTM_NODE_JS_VERSION}
           imagePullPolicy: IfNotPresent
           command: ["/usr/bin/supervisord"]
           args: ["-c", "/etc/supervisord.conf"]
