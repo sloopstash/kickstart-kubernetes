@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ollama
+spec:
+  selector:
+    matchLabels:
+      service: ollama
+  replicas: 1
+  serviceName: ollama
+  template:
+    metadata:
+      labels:
+        service: ollama
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                    - cloud
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                    - aws
+                    - azure
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                    - ec2
+                    - eks
+                    - aks
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                    - ap-south-1
+                    - centralindia
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-b
+                    - ap-south-1b
+                    - zone-2
+      containers:
+        - name: main
+          image: sloopstash/ollama:v${AIA_OLLAMA_VERSION}
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: ollama-model
+              mountPath: /opt/ollama/model
+            - name: ollama-data
+              mountPath: /opt/ollama/data
+            - name: ollama-log
+              mountPath: /opt/ollama/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: ollama-supervisor
+              mountPath: /opt/ollama/system/supervisor.ini
+              subPath: supervisor.ini
+          ports:
+            - containerPort: 11434
+          readinessProbe:
+            tcpSocket:
+              port: 11434
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: ollama-model
+          persistentVolumeClaim:
+            claimName: ollama-model
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: ollama-data
+        - name: ollama-log
+          persistentVolumeClaim:
+            claimName: ollama-log
+        - name: supervisor-server
+          configMap:
+            name: ollama
+        - name: ollama-supervisor
+          configMap:
+            name: ollama
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+  volumeClaimTemplates:
+    - metadata:
+        name: ollama-model
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: ollama-data
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: ollama-log
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi

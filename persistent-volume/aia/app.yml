@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-${ENVIRONMENT}-aia-app-log
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/${ENVIRONMENT}/aia/app/log
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-aia
+    name: sloopstash-${ENVIRONMENT}-aia-app-log
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+              - cloud
+          - key: provider
+            operator: In
+            values:
+              - host
+              - aws
+              - azure
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+              - ec2
+              - eks
+              - aks
+          - key: region
+            operator: In
+            values:
+              - local
+              - ap-south-1
+              - centralindia
+          - key: availability_zone
+            operator: In
+            values:
+              - local-c
+              - ap-south-1a
+              - zone-1

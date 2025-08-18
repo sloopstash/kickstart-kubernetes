@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: chroma
+spec:
+  selector:
+    matchLabels:
+      service: chroma
+  replicas: 1
+  serviceName: chroma
+  template:
+    metadata:
+      labels:
+        service: chroma
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                    - cloud
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                    - aws
+                    - azure
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                    - ec2
+                    - eks
+                    - aks
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                    - ap-south-1
+                    - centralindia
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-b
+                    - ap-south-1b
+                    - zone-2
+      containers:
+        - name: main
+          image: sloopstash/chroma:v${AIA_CHROMA_VERSION}
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: chroma-data
+              mountPath: /opt/chroma/data
+            - name: chroma-log
+              mountPath: /opt/chroma/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: chroma-supervisor
+              mountPath: /opt/chroma/system/supervisor.ini
+              subPath: supervisor.ini
+            - name: chroma-server
+              mountPath: /opt/chroma/conf/server.conf
+              subPath: server.conf
+          ports:
+            - containerPort: 22000
+          readinessProbe:
+            tcpSocket:
+              port: 22000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: chroma-data
+          persistentVolumeClaim:
+            claimName: chroma-data
+        - name: chroma-log
+          persistentVolumeClaim:
+            claimName: chroma-log
+        - name: supervisor-server
+          configMap:
+            name: chroma
+        - name: chroma-supervisor
+          configMap:
+            name: chroma
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+        - name: chroma-server
+          configMap:
+            name: chroma
+            items:
+              - key: server.conf
+                path: server.conf
+  volumeClaimTemplates:
+    - metadata:
+        name: chroma-data
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: chroma-log
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi

@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  selector:
+    matchLabels:
+      service: app
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: app
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                    - cloud
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                    - aws
+                    - azure
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                    - ec2
+                    - eks
+                    - aks
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                    - ap-south-1
+                    - centralindia
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-c
+                    - ap-south-1a
+                    - zone-1
+      containers:
+        - name: main
+          image: sloopstash/python:v${AIA_PYTHON_VERSION}
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          env:
+            - name: STATIC_ENDPOINT
+              value: app-static.aia.${EXTERNAL_DOMAIN}:${AIA_NGINX_PORT}
+          volumeMounts:
+            - name: app-source
+              mountPath: /opt/app/source
+            - name: app-log
+              mountPath: /opt/app/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: app-supervisor
+              mountPath: /opt/app/system/supervisor.ini
+              subPath: app-supervisor
+          ports:
+            - containerPort: 2000
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /health
+              port: 2000
+              httpHeaders:
+                - name: Host
+                  value: localhost
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            exec:
+              command:
+                - "/usr/bin/supervisorctl"
+                - "status"
+                - "app"
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: app-source
+          hostPath:
+            path: ${AIA_APP_SOURCE}
+            type: Directory
+        - name: app-log
+          persistentVolumeClaim:
+            claimName: sloopstash-${ENVIRONMENT}-aia-app-log
+        - name: supervisor-server
+          configMap:
+            name: app
+        - name: app-supervisor
+          configMap:
+            name: app
