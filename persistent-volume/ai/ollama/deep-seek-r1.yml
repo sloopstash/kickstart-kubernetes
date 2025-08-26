@@ -1,0 +1,179 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-${ENVIRONMENT}-ollama-deep-seek-r1-0-model
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/${ENVIRONMENT}/ollama/deep-seek-r1/0/model
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-ai-s1
+    name: ollama-deep-seek-r1-model-deep-seek-r1-0
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+              - cloud
+          - key: provider
+            operator: In
+            values:
+              - host
+              - aws
+              - azure
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+              - ec2
+              - eks
+              - aks
+          - key: region
+            operator: In
+            values:
+              - local
+              - ap-south-1
+              - centralindia
+          - key: availability_zone
+            operator: In
+            values:
+              - local-b
+              - ap-south-1b
+              - zone-2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-${ENVIRONMENT}-ollama-deep-seek-r1-0-data
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/${ENVIRONMENT}/ollama/deep-seek-r1/0/data
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-ai-s1
+    name: ollama-deep-seek-r1-data-deep-seek-r1-0
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+              - cloud
+          - key: provider
+            operator: In
+            values:
+              - host
+              - aws
+              - azure
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+              - ec2
+              - eks
+              - aks
+          - key: region
+            operator: In
+            values:
+              - local
+              - ap-south-1
+              - centralindia
+          - key: availability_zone
+            operator: In
+            values:
+              - local-b
+              - ap-south-1b
+              - zone-2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sloopstash-${ENVIRONMENT}-ollama-deep-seek-r1-0-log
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/sloopstash/${ENVIRONMENT}/ollama/deep-seek-r1/0/log
+  claimRef:
+    namespace: sloopstash-${ENVIRONMENT}-ai-s1
+    name: ollama-deep-seek-r1-log-deep-seek-r1-0
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+              - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - worker
+          - key: type
+            operator: In
+            values:
+              - on-premise
+              - cloud
+          - key: provider
+            operator: In
+            values:
+              - host
+              - aws
+              - azure
+          - key: service
+            operator: In
+            values:
+              - virtualbox
+              - ec2
+              - eks
+              - aks
+          - key: region
+            operator: In
+            values:
+              - local
+              - ap-south-1
+              - centralindia
+          - key: availability_zone
+            operator: In
+            values:
+              - local-b
+              - ap-south-1b
+              - zone-2

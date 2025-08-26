@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: llama-3-2
+spec:
+  selector:
+    matchLabels:
+      service: llama-3-2
+  replicas: 1
+  serviceName: llama-3-2
+  template:
+    metadata:
+      labels:
+        service: llama-3-2
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                    - cloud
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                    - aws
+                    - azure
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                    - ec2
+                    - eks
+                    - aks
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                    - ap-south-1
+                    - centralindia
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-c
+                    - ap-south-1a
+                    - zone-1
+      containers:
+        - name: main
+          image: sloopstash/ollama:v${AI_OLLAMA_VERSION}
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: ollama-llama-3-2-model
+              mountPath: /opt/ollama/model
+            - name: ollama-llama-3-2-data
+              mountPath: /opt/ollama/data
+            - name: ollama-llama-3-2-log
+              mountPath: /opt/ollama/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: ollama-llama-3-2-supervisor
+              mountPath: /opt/ollama/system/supervisor.ini
+              subPath: supervisor.ini
+          ports:
+            - containerPort: 11434
+          livenessProbe:
+            tcpSocket:
+              port: 11434
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 11434
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      volumes:
+        - name: ollama-llama-3-2-model
+          persistentVolumeClaim:
+            claimName: ollama-llama-3-2-model
+        - name: ollama-llama-3-2-data
+          persistentVolumeClaim:
+            claimName: ollama-llama-3-2-data
+        - name: ollama-llama-3-2-log
+          persistentVolumeClaim:
+            claimName: ollama-llama-3-2-log
+        - name: supervisor-server
+          configMap:
+            name: llama-3-2
+        - name: ollama-llama-3-2-supervisor
+          configMap:
+            name: llama-3-2
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+  volumeClaimTemplates:
+    - metadata:
+        name: ollama-llama-3-2-model
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: ollama-llama-3-2-data
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: ollama-llama-3-2-log
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi

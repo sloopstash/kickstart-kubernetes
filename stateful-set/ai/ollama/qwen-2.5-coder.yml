@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: qwen-2-5-coder
+spec:
+  selector:
+    matchLabels:
+      service: qwen-2-5-coder
+  replicas: 1
+  serviceName: qwen-2-5-coder
+  template:
+    metadata:
+      labels:
+        service: qwen-2-5-coder
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+                - key: type
+                  operator: In
+                  values:
+                    - on-premise
+                    - cloud
+                - key: provider
+                  operator: In
+                  values:
+                    - host
+                    - aws
+                    - azure
+                - key: service
+                  operator: In
+                  values:
+                    - virtualbox
+                    - ec2
+                    - eks
+                    - aks
+                - key: region
+                  operator: In
+                  values:
+                    - local
+                    - ap-south-1
+                    - centralindia
+                - key: availability_zone
+                  operator: In
+                  values:
+                    - local-c
+                    - ap-south-1a
+                    - zone-1
+      containers:
+        - name: main
+          image: sloopstash/ollama:v${AI_OLLAMA_VERSION}
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/supervisord"]
+          args: ["-c", "/etc/supervisord.conf"]
+          volumeMounts:
+            - name: ollama-qwen-2-5-coder-model
+              mountPath: /opt/ollama/model
+            - name: ollama-qwen-2-5-coder-data
+              mountPath: /opt/ollama/data
+            - name: ollama-qwen-2-5-coder-log
+              mountPath: /opt/ollama/log
+            - name: supervisor-server
+              mountPath: /etc/supervisord.conf
+              subPath: supervisor-server
+            - name: ollama-qwen-2-5-coder-supervisor
+              mountPath: /opt/ollama/system/supervisor.ini
+              subPath: supervisor.ini
+          ports:
+            - containerPort: 11434
+          livenessProbe:
+            tcpSocket:
+              port: 11434
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 11434
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      volumes:
+        - name: ollama-qwen-2-5-coder-model
+          persistentVolumeClaim:
+            claimName: ollama-qwen-2-5-coder-model
+        - name: ollama-qwen-2-5-coder-data
+          persistentVolumeClaim:
+            claimName: ollama-qwen-2-5-coder-data
+        - name: ollama-qwen-2-5-coder-log
+          persistentVolumeClaim:
+            claimName: ollama-qwen-2-5-coder-log
+        - name: supervisor-server
+          configMap:
+            name: qwen-2-5-coder
+        - name: ollama-qwen-2-5-coder-supervisor
+          configMap:
+            name: qwen-2-5-coder
+            items:
+              - key: supervisor.ini
+                path: supervisor.ini
+  volumeClaimTemplates:
+    - metadata:
+        name: ollama-qwen-2-5-coder-model
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: ollama-qwen-2-5-coder-data
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: ollama-qwen-2-5-coder-log
+      spec:
+        storageClassName: standard
+        volumeMode: Filesystem
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi

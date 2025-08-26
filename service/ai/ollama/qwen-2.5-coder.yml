@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwen-2-5-coder
+  labels:
+    service: qwen-2-5-coder
+spec:
+  ports:
+    - port: 11434
+      targetPort: 11434
+      protocol: TCP
+  selector:
+    service: qwen-2-5-coder

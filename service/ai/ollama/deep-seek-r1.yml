@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: deep-seek-r1
+  labels:
+    service: deep-seek-r1
+spec:
+  ports:
+    - port: 11434
+      targetPort: 11434
+      protocol: TCP
+  selector:
+    service: deep-seek-r1
