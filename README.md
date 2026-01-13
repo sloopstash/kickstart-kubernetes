@@ -1,8 +1,8 @@
-# SloopStash Kubernetes starter-kit
+# SloopStash Kubernetes kit
 
 
 ## Getting started
-Please refer to the [documentation](https://sloopstash.com/documentation/toolkit/container/kubernetes/index.html) for detailed instructions on how to get started with SloopStash Kubernetes starter-kit.
+Please refer to the [documentation](https://sloopstash.com/documentation/toolkit/container/kubernetes/index.html) for detailed instructions on how to get started with SloopStash Kubernetes kit.
 
 
 ## Get support
