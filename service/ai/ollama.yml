@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama-deep-seek
+  labels:
+    service: ollama-deep-seek
+spec:
+  ports:
+    - port: 11434
+      targetPort: 11434
+      protocol: TCP
+  selector:
+    service: ollama-deep-seek
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama-deep-seek-coder
+  labels:
+    service: ollama-deep-seek-coder
+spec:
+  ports:
+    - port: 11434
+      targetPort: 11434
+      protocol: TCP
+  selector:
+    service: ollama-deep-seek-coder
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama-gemma
+  labels:
+    service: ollama-gemma
+spec:
+  ports:
+    - port: 11434
+      targetPort: 11434
+      protocol: TCP
+  selector:
+    service: ollama-gemma
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama-llama
+  labels:
+    service: ollama-llama
+spec:
+  ports:
+    - port: 11434
+      targetPort: 11434
+      protocol: TCP
+  selector:
+    service: ollama-llama
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama-qwen-coder
+  labels:
+    service: ollama-qwen-coder
+spec:
+  ports:
+    - port: 11434
+      targetPort: 11434
+      protocol: TCP
+  selector:
+    service: ollama-qwen-coder
