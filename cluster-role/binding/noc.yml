@@ -5,7 +5,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: web
-    namespace: kubernetes-dashboard
+    namespace: headlamp
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

@@ -2,4 +2,4 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: web
-  namespace: kubernetes-dashboard
+  namespace: headlamp
