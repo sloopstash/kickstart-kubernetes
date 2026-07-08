@@ -2,11 +2,15 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: noc
+  namespace: headlamp
 rules:
   - apiGroups:
       - ''
     resources:
+      - services
       - services/proxy
+      - pods
+      - pods/portforward
     verbs:
       - get
       - list
