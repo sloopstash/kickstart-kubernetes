@@ -5,7 +5,22 @@ metadata:
 rules:
   - apiGroups:
       - ''
+      - apps
     resources:
+      - pods
+      - pods/portforward
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ''
+    resources:
+      - services
       - services/proxy
     verbs:
       - get
