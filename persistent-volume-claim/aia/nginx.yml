@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: sloopstash-${ENVIRONMENT}-aia-nginx-log
 spec:
-  storageClassName: standard
+  storageClassName: sloopstash-aia-nginx-log-local
   volumeName: sloopstash-${ENVIRONMENT}-aia-nginx-log
   volumeMode: Filesystem
   accessModes:

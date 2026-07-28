@@ -3,7 +3,7 @@ kind: PersistentVolume
 metadata:
   name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-broker-0-data
 spec:
-  storageClassName: standard
+  storageClassName: sloopstash-data-lake-s2-kafka-broker-data-local
   capacity:
     storage: 5Gi
   volumeMode: Filesystem
@@ -38,32 +38,37 @@ spec:
               - host
               - aws
               - azure
+              - sloopengine
           - key: service
             operator: In
             values:
               - virtualbox
+              - vmware
               - ec2
               - eks
               - aks
+              - compute
           - key: region
             operator: In
             values:
               - local
               - ap-south-1
               - centralindia
+              - ind-chn-1
           - key: availability_zone
             operator: In
             values:
               - local-c
               - ap-south-1b
               - zone-2
+              - ind-chn-1a
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-broker-0-log
 spec:
-  storageClassName: standard
+  storageClassName: sloopstash-data-lake-s2-kafka-broker-log-local
   capacity:
     storage: 2Gi
   volumeMode: Filesystem
@@ -98,32 +103,37 @@ spec:
               - host
               - aws
               - azure
+              - sloopengine
           - key: service
             operator: In
             values:
               - virtualbox
+              - vmware
               - ec2
               - eks
               - aks
+              - compute
           - key: region
             operator: In
             values:
               - local
               - ap-south-1
               - centralindia
+              - ind-chn-1
           - key: availability_zone
             operator: In
             values:
               - local-c
               - ap-south-1b
               - zone-2
+              - ind-chn-1a
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-broker-1-data
 spec:
-  storageClassName: standard
+  storageClassName: sloopstash-data-lake-s2-kafka-broker-data-local
   capacity:
     storage: 5Gi
   volumeMode: Filesystem
@@ -158,32 +168,37 @@ spec:
               - host
               - aws
               - azure
+              - sloopengine
           - key: service
             operator: In
             values:
               - virtualbox
+              - vmware
               - ec2
               - eks
               - aks
+              - compute
           - key: region
             operator: In
             values:
               - local
               - ap-south-1
               - centralindia
+              - ind-chn-1
           - key: availability_zone
             operator: In
             values:
               - local-c
               - ap-south-1b
               - zone-2
+              - ind-chn-1a
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-broker-1-log
 spec:
-  storageClassName: standard
+  storageClassName: sloopstash-data-lake-s2-kafka-broker-log-local
   capacity:
     storage: 2Gi
   volumeMode: Filesystem
@@ -218,32 +233,37 @@ spec:
               - host
               - aws
               - azure
+              - sloopengine
           - key: service
             operator: In
             values:
               - virtualbox
+              - vmware
               - ec2
               - eks
               - aks
+              - compute
           - key: region
             operator: In
             values:
               - local
               - ap-south-1
               - centralindia
+              - ind-chn-1
           - key: availability_zone
             operator: In
             values:
               - local-c
               - ap-south-1b
               - zone-2
+              - ind-chn-1a
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-broker-2-data
 spec:
-  storageClassName: standard
+  storageClassName: sloopstash-data-lake-s2-kafka-broker-data-local
   capacity:
     storage: 5Gi
   volumeMode: Filesystem
@@ -278,32 +298,37 @@ spec:
               - host
               - aws
               - azure
+              - sloopengine
           - key: service
             operator: In
             values:
               - virtualbox
+              - vmware
               - ec2
               - eks
               - aks
+              - compute
           - key: region
             operator: In
             values:
               - local
               - ap-south-1
               - centralindia
+              - ind-chn-1
           - key: availability_zone
             operator: In
             values:
               - local-c
               - ap-south-1b
               - zone-2
+              - ind-chn-1a
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: sloopstash-${ENVIRONMENT}-data-lake-s2-kafka-broker-2-log
 spec:
-  storageClassName: standard
+  storageClassName: sloopstash-data-lake-s2-kafka-broker-log-local
   capacity:
     storage: 2Gi
   volumeMode: Filesystem
@@ -338,22 +363,27 @@ spec:
               - host
               - aws
               - azure
+              - sloopengine
           - key: service
             operator: In
             values:
               - virtualbox
+              - vmware
               - ec2
               - eks
               - aks
+              - compute
           - key: region
             operator: In
             values:
               - local
               - ap-south-1
               - centralindia
+              - ind-chn-1
           - key: availability_zone
             operator: In
             values:
               - local-c
               - ap-south-1b
               - zone-2
+              - ind-chn-1a

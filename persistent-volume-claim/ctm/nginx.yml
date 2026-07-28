@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: sloopstash-${ENVIRONMENT}-ctm-nginx-log
 spec:
-  storageClassName: standard
+  storageClassName: sloopstash-ctm-nginx-log-local
   volumeName: sloopstash-${ENVIRONMENT}-ctm-nginx-log
   volumeMode: Filesystem
   accessModes:

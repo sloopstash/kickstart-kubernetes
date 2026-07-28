@@ -37,25 +37,30 @@ spec:
                     - host
                     - aws
                     - azure
+                    - sloopengine
                 - key: service
                   operator: In
                   values:
                     - virtualbox
+                    - vmware
                     - ec2
                     - eks
                     - aks
+                    - compute
                 - key: region
                   operator: In
                   values:
                     - local
                     - ap-south-1
                     - centralindia
+                    - ind-chn-1
                 - key: availability_zone
                   operator: In
                   values:
                     - local-b
                     - ap-south-1b
                     - zone-2
+                    - ind-chn-1a
       containers:
         - name: main
           image: sloopstash/chroma:v${AIA_CHROMA_VERSION}
@@ -109,7 +114,7 @@ spec:
     - metadata:
         name: chroma-data
       spec:
-        storageClassName: standard
+        storageClassName: sloopstash-aia-chroma-data-local
         volumeMode: Filesystem
         accessModes:
           - ReadWriteOnce
@@ -119,7 +124,7 @@ spec:
     - metadata:
         name: chroma-log
       spec:
-        storageClassName: standard
+        storageClassName: sloopstash-aia-chroma-log-local
         volumeMode: Filesystem
         accessModes:
           - ReadWriteOnce

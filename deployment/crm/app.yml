@@ -36,25 +36,30 @@ spec:
                     - host
                     - aws
                     - azure
+                    - sloopengine
                 - key: service
                   operator: In
                   values:
                     - virtualbox
+                    - vmware
                     - ec2
                     - eks
                     - aks
+                    - compute
                 - key: region
                   operator: In
                   values:
                     - local
                     - ap-south-1
                     - centralindia
+                    - ind-chn-1
                 - key: availability_zone
                   operator: In
                   values:
                     - local-c
                     - ap-south-1a
                     - zone-1
+                    - ind-chn-1a
       containers:
         - name: main
           image: sloopstash/python:v${CRM_PYTHON_VERSION}
