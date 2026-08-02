@@ -8,6 +8,7 @@ rules:
       - apps
     resources:
       - persistentvolumeclaims
+      - secrets
       - configmaps
       - statefulsets
       - deployments
@@ -26,6 +27,7 @@ rules:
       - ''
     resources:
       - services
+      - endpoints
     verbs:
       - get
       - list

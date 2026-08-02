@@ -8,12 +8,15 @@ rules:
       - apps
     resources:
       - persistentvolumeclaims
+      - secrets
       - configmaps
       - statefulsets
       - deployments
       - replicasets
       - daemonsets
       - pods
+      - pods/portforward
+      - pods/exec
     verbs:
       - get
       - list
@@ -26,6 +29,8 @@ rules:
       - ''
     resources:
       - services
+      - services/proxy
+      - endpoints
     verbs:
       - get
       - list
