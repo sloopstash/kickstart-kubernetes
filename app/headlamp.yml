@@ -4,8 +4,10 @@ metadata:
   name: headlamp
   namespace: kube-system
 spec:
+  type: NodePort
   ports:
     - port: 80
+      nodePort: 4466
       targetPort: 4466
   selector:
     k8s-app: headlamp

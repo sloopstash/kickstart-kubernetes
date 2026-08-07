@@ -1,0 +1,57 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: ollama-deep-seek.ai-s1.${EXTERNAL_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ollama-deep-seek
+                port:
+                  number: 11434
+    - host: ollama-deep-seek-coder.ai-s1.${EXTERNAL_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ollama-deep-seek-coder
+                port:
+                  number: 11434
+    - host: ollama-gemma.ai-s1.${EXTERNAL_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ollama-gemma
+                port:
+                  number: 11434
+    - host: ollama-llama.ai-s1.${EXTERNAL_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ollama-llama
+                port:
+                  number: 11434
+    - host: ollama-qwen-coder.ai-s1.${EXTERNAL_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ollama-qwen-coder
+                port:
+                  number: 11434
